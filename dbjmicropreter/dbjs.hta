@@ -1,0 +1,260 @@
+<!DOCTYPE html />
+<!--- PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd" --->
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<!--
+//-----------------------------------------------------------------------------
+//                                                                  
+//  DBJ(tm) - Solution Evolution(tm)
+//                                                                  
+//  Copyright© DBJ.ORG. 
+//  All Rights Reserved. GPL applies.                                             
+//                                                                  
+//  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF DBJ.ORG   
+//                                                                  
+//  The copyright notice above does not evidence any                
+//  actual or intended publication of such source code.             
+//                                                                             
+//-----------------------------------------------------------------------------
+-->
+<head>
+<!--##########################################################################################################-->
+<!--		  Set document compatibility mode to IE8Mode                                                      -->
+<!----meta http-equiv="X-UA-Compatible" content="IE=edge" /--->
+<meta http-equiv="X-UA-Compatible" content="IE=9" /> 
+<meta http-equiv="content-type" content="application/xhtml+xml; charset=iso-8859-1" />
+<!--##########################################################################################################-->
+
+	 <HTA:APPLICATION ID="oHTA"
+	 APPLICATIONNAME="dbj_javascript_micropreter"
+	 BORDER="thin"
+	 BORDERSTYLE="normal"
+	 CAPTION="yes"
+	 ICON="dbjtamtam.ico"
+	 MAXIMIZEBUTTON="yes"
+	 MINIMIZEBUTTON="yes"
+	 SHOWINTASKBAR="yes"
+	 SINGLEINSTANCE="no"
+	 SYSMENU="yes"
+	 VERSION="2011"
+	 WINDOWSTATE="normal"
+	 />
+
+		<Title>&nbsp;</Title>
+		<!--- meta name="vs_targetSchema" content="http://schemas.microsoft.com/intellisense/ie6" / --->
+		<meta http-equiv="Content-Type" content="text/html; charset=Windows-1252" />
+		<style type="text/css" media="screen">
+		object { display:none; }
+		html { height:99%; width:99%; }
+		body { width:100%; height:100%; overflow:hidden; background-color:buttonface; }
+		.wide { width:100%;}
+		.upleft { top:0; left:0; position:relative; }
+		.big { height:99%; }
+		.toolbar_button { font-family:verdana Tahoma; font-size:small; margin:3px; width:15%; }
+		textarea#display { 
+				border:1px solid;  
+				padding:3px; overflow:auto; 
+				font:bolder large/1.0 courier new,courier ;
+				background-color:white; color:Black;
+				height:90%;  
+				}
+		div#toolbar { background-color:buttonface; vertical-align:middle; }
+		</style>
+		
+	</HEAD>
+<body scroll="no" >
+<!-- *** begin modal instantiation *** -->	
+<!---
+div id='modal' style="behavior:url(dbj_modal_2.htc);" NOUNLOAD_MESSAGE="*** THIS*MODAL Dialogue WARNING ***" NODEBUG 
+/---> 
+<!-- DEBUG attr. fires ondebug event. event.dbgmsg property is the debug message -->
+<!-- *** end of modal instantiation *** -->	
+	<!--Create the Dialog Helper Object-->
+ <object id=dlgHelper CLASSID="clsid:3050f819-98b5-11cf-bb82-00aa00bdce0b" WIDTH="0px" HEIGHT="0px" VIEWASTEXT></object>
+<!-- Create the licensing object for the common dialog activex control -->
+<object CLASSID="clsid:5220cb21-c88d-11cf-b347-00aa00a28331"  ID="Object1" VIEWASTEXT>
+	<PARAM NAME="LPKPath" VALUE="comdlg.lpk">
+</object>
+<!--Create the Common Dialog Box activex control-->
+<object ID="cDialog" WIDTH="0px" HEIGHT="0px"
+	CLASSID="CLSID:F9043C85-F6F2-101A-A3C9-08002B2F49FB"
+	CODEBASE="comdlg32.cab" VIEWASTEXT>
+</object>
+<!-- #################################################################################################### -->
+<div id="toolbar" class="wide" align="center" >
+	<button id="dugme_eval" class='toolbar_button' title="CTRL+Eval: html output" >Eval</button>
+	<button id="dugme_jqry" class='toolbar_button' onclick="return window.showModelessDialog('http://docs.jquery.com/Main_Page',null,'resizable:1;dialogWidth:800px;dialogHeight:600px');">jQuery</button>
+	<button id="dugme_new" class='toolbar_button'  >New</button>
+	<button id="dugme_save" class='toolbar_button' >Save</button>
+	<button id="dugme_load" class='toolbar_button' >Load</button>
+	<button id="dugme_quit" class='toolbar_button' >Quit</button>
+</div> 
+<textarea id="display" wrap='off' tabindex="6" class="wide" title="Right click: remove c-style comments, CTRL+Right click: compress. ALT+Right click:decompress." ></textarea>
+</body>
+<script src="http://code.jquery.com/jquery-1.6.1.js" type="text/javascript" id="JQUERY161" onload="/* alert('JQUERY142 Loaded!') */" ></script>
+<script src="../lib/jquery.rightClick.js" type="text/javascript"></script>
+<script src="http://dbj.org/6/dbj.lib.js" type="text/javascript"></script>
+<script src="http://dbj.org/6/dbj.es5.js" type="text/javascript"></script>
+<script src="http://dbj.org/6/dbj.jquery.js" type="text/javascript"></script>
+<script src="http://dbj.org/6/dbj.xml.json.js" type="text/javascript"></script>
+<!--- *** --->
+<script src="../lib/chili/jquery.chili-2.2.js" type="text/javascript"></script>
+<script src="../lib/chili/recipes.js" type="text/javascript"></script>
+<!--- *** --->
+<script src="dbjs.js" type="text/javascript"></script>
+<script src="plugins/ado/ado.vbs" type="text/vbscript" ></script>
+<script src="plugins/ado/dbj.ado.vbs" type="text/vbscript" ></script>
+<script src="plugins/winsearch.js" type="text/javacript" ></script>
+<script type="text/javascript" >
+//-----------------------------------------------------------------------
+	dbj.addListener("load", function () {
+		@if (@_DEBUG) debugger;	@end
+		//-----------------------------------------------------------------------
+		var shell = new ActiveXObject("WScript.Shell");
+		var cpu = shell.ExpandEnvironmentStrings("%PROCESSOR_ARCHITECTURE%").toLowerCase();
+		//-----------------------------------------------------------------------
+		THIS.onload();
+		main_event_handlers(THIS.$display);
+		THIS.plugins.load();
+		//-----------------------------------------------------------------------
+		document.title = THIS.title; // show some info as the window caption
+		// make access keys from first chars of each buttons text
+		$("button", toolbar).each(
+			function () {
+				var inner_text = this.innerText,
+				access_char = inner_text.substring(0, 1),
+				inner_html = '<span style="text-decoration:underline;">' + access_char + '</span>' +
+							inner_text.substr(1);
+				this.accessKey = access_char;
+				this.innerHTML = inner_html;
+			}
+		);
+
+		//ensure that all document elements except the display textarea are unselectable
+		$("*", document.body).each(
+		 function (i) { this.unselectable = "on"; }
+		);
+		display.unselectable = "off"; display.focus();
+
+		dbj.later(
+		function () { /*THIS.copyright_notice */
+			var msg = "\n" + THIS.title + "\t" + document.domain + " V:" + document.lastModified +
+			"\n" + dbj +
+			"\njQuery: " + $(document.body).jquery +
+			"\nhost: IE" + (document.documentMode ? document.documentMode : document.compatMode) +
+			"\nPROCESSOR_ARCHITECTURE : " + cpu +
+			"\n-------------------------------------------------------------------------- " +
+			"\n(c)" + THIS.thisYear + ", by DBJ.ORG (mailto:dbj@dbj.org)\n";
+			THIS.print2(msg);
+			});
+			ChiliBook.automatic = false;
+			ChiliBook.lineNumbers = false;
+});
+//-------------------------------------------------------------------------
+</script>
+<script type="text/vbscript">
+'-----------------------------------------------------------------------
+Function DisplayCustomError(strMessage)
+	'Display custom message and information from VBScript Err object.
+	dim strError : strError = VbCrLf & strMessage & VbCrLf & _
+	  "Number (dec) : " & Err.Number & VbCrLf & _
+	  "Number (hex) : &H" & Hex(Err.Number) & VbCrLf & _
+	  "Description  : " & Err.Description & VbCrLf & _
+	  "Source       : " & Err.Source
+	Err.Clear
+	DisplayCustomError = MsgBox(strError,16,"DBJ VBScript Error Box")
+End Function
+'------------------------------------------------------------------------
+function mBox(m_,n,t_)
+	On Error Resume Next
+			dim x : x=MsgBox(m_,n, t_)
+			If Err = 0 Then
+					mBox = x
+			Else
+					dim  strMessage : strMessage = "VBS ERROR: Inside mBox()"
+					mBox = DisplayCustomError(strMessage)
+			End If
+end function
+</script>
+<script type="text/javascript">
+			top.M$FT = top.M$FT || (/*@cc_on!@*/false);  
+			top.NL = top.NL || (M$FT ? "\r\n" : "\n");
+	if (top.M$FT) {
+		top.dbj = top.dbj || {};
+		dbj.mbox = (function () {
+
+			var retvals = {
+				/* VBScript msg box can return" */
+				"1": "vbOK - OK was clicked",
+				"2": "vbCancel - Cancel was clicked ",
+				"3": "vbAbort - Abort was clicked",
+				"4": "vbRetry - Retry was clicked",
+				"5": "vbIgnore - Ignore was clicked",
+				"6": "vbYes - Yes was clicked",
+				"7": "vbNo - No was clicked"
+			},
+			buttons = {
+				/* buttons argument is one of these integers: */
+				"1": "OK and Cancel buttons",
+				"2": "Abort, Retry, and Ignore buttons",
+				"3": "Yes, No, and Cancel  buttons",
+				"4": "Yes and No buttons",
+				"5": "Retry and Cancel buttons"
+			},
+			icons = {
+				/* To show icons bellow add the number to the buttons number above */
+				"16": "Critical message icon",
+				"32": "Warning Query icon",
+				"48": "Warning Message icon",
+				"64": "Information Message"
+			},
+			default_title = "DBJ.ORG Message Box";
+			function hlp() {
+				function o2s(o_) {
+					var r = [];
+					for (var p in o_) r.push(p + " : " + o_[p]);
+					return r.join(top.NL);
+				}
+				var s = ["retval = dbj.mbox( message, title, option)", "Return Values", o2s(retvals), "Option arguments is integer which is one of ", "Buttons", o2s(buttons), "Plus one of these", "Icons", o2s(icons)]
+				mBox(s.join(top.NL), 65, default_title);
+			}
+			function popit(m_, o_, t_) {
+				if (!m_) return hlp(); /* No message given, assuming debugging */
+				t_ = t_ || default_title;
+				o_ = o_ || 1;
+				return mBox(m_, o_, t_);
+			}
+			/*
+			opts object 
+			*/
+			var default_ /*options*/ = {
+				m: null,
+				o: 1,
+				t: "DBJ.ORG Message Box",
+				"1": function () { return "vbOK - OK was clicked"; },
+				"2": function () { return "vbCancel - Cancel was clicked "; },
+				"3": function () { return "vbAbort - Abort was clicked"; },
+				"4": function () { return "vbRetry - Retry was clicked"; },
+				"5": function () { return "vbIgnore - Ignore was clicked"; },
+				"6": function () { return "vbYes - Yes was clicked"; },
+				"7": function () { return "vbNo - No was clicked"; }
+			}
+			return function (opts) {
+				opts = opts || {};
+				/* use default opts where necessary */
+				for (var p in default_) opts[p] = opts[p] || default_[p];
+				return opts[popit(opts.m, opts.o, opts.t)]();
+			}
+		} ());
+		/* helpers */
+		dbj.mbox.yesno = function (msg, onyes, onno) {
+			/* 6 is yes , 7 is no retval */
+			return  dbj.mbox({ "m" : msg, o : 4, "6" : onyes, "7" : onno });
+		}
+}
+</script>
+</html>
+
+
+
+
+
