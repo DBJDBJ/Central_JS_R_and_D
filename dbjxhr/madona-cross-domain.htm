@@ -2,14 +2,27 @@
 <html>
 <head>
 <title>How Many Pictures Of Madonna Do We Have?</title>
-<link href="../dbj.css" rel="stylesheet" type="text/css" />
-    <script src="../jquery.1.3.2.safe.slow.js" type="text/javascript"></script>
-    <script src="../dbj.lib.js" type="text/javascript"></script>
 </head>
 <body>
 <h2>How Many Pictures Of Madonna does WWW contain?</h2>
+
 <script type="text/javascript">
-    function ws_results(obj) {
+/*
+	ws_results(
+	{ "Error": 
+	{ "Title": "The following errors were detected:", 
+	"Message": ["The service has been shut down. For further details, please see the Deprecated Services blog post http:\/\/developer.yahoo.com\/blogs\/ydn\/posts\/2010\/08\/api_updates_and_changes"]
+	} 
+	}
+	);
+ */
+	function ws_results(obj) {
+
+		if (obj.Error) {
+			document.writeln(obj.Error.Title + "<hr/>");
+			document.writeln(obj.Error.Message);
+			return;
+		}
         var now = new Date();
     document.write("<h1>") ;
     document.write("On " + now.toLocaleString() + " ∑≥ ");
