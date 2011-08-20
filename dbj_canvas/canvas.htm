@@ -3,7 +3,7 @@
    <head>
       <meta http-equiv="X-UA-Compatible" content="IE=9" />
       <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-      <title>Test globalCompositeOperation Support</title>
+      <title>DBJ*Canvas Test</title>
       <style type="text/css">
           body { font:12px/1.5 verdana,tahoma,arial; }
       .container{float:left;position:relative;background:transparent; margin:2px; border:1px solid; padding:2px; }
@@ -48,16 +48,45 @@
 			/* square shaped layout */
 			setupLayout: function (host_, new_id, size) {
 				if (!host_[0]) { throw "setupLayout() received bad host_ argument"; }
-				return canvas_unit(host_, new_id, size, size  );
+				return canvas_unit(host_, new_id, size, size);
+			},
+			toDataUrl: function (canvas, img_mime) {
+				/*a bit safer approach*/
+				if (canvas.getContext) {
+					var ctx = canvas.getContext("2d");  // Get the context for the canvas.
+					return canvas.toDataURL(img_mime || "image/png");
+					// Get the data as (an default mime type) png image.
+				}
 			}
 		};
-        // private parts
+		// private parts
 		var canvas_unit = (function () {
 			var counter = 0,
                 tpl = "<div class='container' id='{0}' style='width:{1}px; height:{2}px' >" +
                       "<canvas id='{3}'></canvas>" +
                       "<div class='name' >{4}</div></div>";
-			return function (h_, id_, wid, hgt ) {
+
+			// basic example on how to download canvas as an image
+			function prepare_canvas_snapshot_download_widget(canvas_id, widget_host) {
+				function createDownloadLink(name) {
+					var a = document.createElement("a");
+					a.download = name;
+					a.id = name;
+					a.title = "download snapshot";
+					a.href = "about:blank";
+					a.appendChild(document.createTextNode(name));
+					//
+					a.onclick = function () {
+						a.href = dbjct.toDataUrl($("#"+canvas_id)[0]);
+					};
+					//
+					return document.createElement("p").appendChild(a) ;
+				}
+				// 
+				widget_host.appendChild(createDownloadLink("snapshot" + (-new Date) + ".png"));
+			}
+
+			return function (h_, id_, wid, hgt) {
 				var canvas_id = "canvas{0}".format(counter++),
                         tmp = $(tpl.format(id_, wid, hgt + 20, canvas_id, id_)),
                         canvas = tmp.find("canvas");
@@ -66,6 +95,7 @@
 				canvas[0].width = wid;
 				canvas[0].height = hgt;
 				h_.append(tmp);
+				prepare_canvas_snapshot_download_widget(canvas_id, h_[0]);
 				return canvas;
 			}
 		} ());
