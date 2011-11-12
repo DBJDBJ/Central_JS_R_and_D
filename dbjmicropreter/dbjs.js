@@ -174,7 +174,7 @@
 						continue;
 					}
 				}
-			
+
 			if (!!window.POP.script) {
 				content += "<script type='text/javascript' src='" +
 				   window.POP.script +
@@ -186,7 +186,7 @@
 			return oPopBody; // DBJ 07-NOV-11
 		};
 
-		window.POP.script = "https://getfirebug.com/firebug-lite.js";
+		window.POP.script = null; // "https://getfirebug.com/firebug-lite.js";
 
 	})(window.createPopup());
 	//
@@ -311,7 +311,7 @@ var main_event_handlers = function ($display) {
         if (typeof o !== "string") {
             throw THIS.error("eval(), can not evaluate non-strings?");
         }
-        return eval(o);
+        return eval("(" + o + ")");
     }
     //-----------------------------------------------------------------
     $("#dugme_eval").click(function (E) {

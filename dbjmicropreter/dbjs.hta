@@ -152,7 +152,7 @@ div id='modal' style="behavior:url(dbj_modal_2.htc);" NOUNLOAD_MESSAGE="*** THIS
 		//-----------------------------------------------------------------------
 		THIS.onload();
 		main_event_handlers(THIS.$display);
-		THIS.plugins.load();
+		// THIS.plugins.load();
 		//-----------------------------------------------------------------------
 		document.title = THIS.title; // show some info as the window caption
 		// make access keys from first chars of each buttons text
@@ -180,10 +180,15 @@ div id='modal' style="behavior:url(dbj_modal_2.htc);" NOUNLOAD_MESSAGE="*** THIS
 			P(THIS.title + "&nbsp;" + document.domain + " V:" + document.lastModified,
 			dbj + "",
 			"jQuery: " + $(document.body).jquery,
-			"host: IE" + (document.documentMode ? document.documentMode : document.compatMode),
-			"PROCESSOR_ARCHITECTURE : " + shell.ExpandEnvironmentStrings("%PROCESSOR_ARCHITECTURE%"),
+			"documentMode: " + document.documentMode,
+			"compatMode: " + document.compatMode );
+			for (i = 0; i < document.compatible.length; i++) {
+				P( " userAgent = " + document.compatible[i].userAgent + ", version   = " + document.compatible[i].version );
+			}
+			P("PROCESSOR_ARCHITECTURE : " + shell.ExpandEnvironmentStrings("%PROCESSOR_ARCHITECTURE%"),
 			"-------------------------------------------------------------------------- ",
 			"&copy;" + THIS.thisYear + ", by DBJ.ORG (mailto:dbj@dbj.org)",
+			"-------------------------------------------------------------------------- ",
 			"Scripts loaded:",
 			dbjdbj.reporter().join("<br/>")
 			);
@@ -204,9 +209,11 @@ div id='modal' style="behavior:url(dbj_modal_2.htc);" NOUNLOAD_MESSAGE="*** THIS
 			"http://dbj.org/6/dbj.xml.json.js",
 			"../lib/chili/jquery.chili-2.2.js",
 			"../lib/chili/recipes.js",
+/*
 			"plugins/ado/ado.vbs",
 			"plugins/ado/dbj.ado.vbs",
 			"plugins/winsearch.js",
+*/
 			"dbjs.js"
 			],
 			function () { return !!window.jQuery && !!window.dbj && !!window.THIS; },
