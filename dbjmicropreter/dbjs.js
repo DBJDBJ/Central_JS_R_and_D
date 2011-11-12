@@ -5,181 +5,191 @@
 //@set @_TRACE =(1==0)
 //
 (function (window, undefined) {
-    //
-    var this_year = (new Date).getFullYear(),
+	//
+	var this_year = (new Date).getFullYear(),
         comment_begin = String.NL + "/*" + String.NL,
         comment_end = String.NL + "*/" + String.NL
         ;
-    window.THIS = {
-        ///<summary>
-        /// This application object
-        ///</summary>
-        BUILD: "$Revision: 6 $$Date: 29/06/11 0:15 $",
-        display_id: "display",
-        $display: $("#display"),
-        toString: function () { return "DBJ*MicroPreter " + THIS.BUILD; },
-        thisYear: this_year,
-        title: "DBJ*Micropreter(tm) 2001-" + this_year,
-        print_: function (s_) {
-            s_ = s_ || ""; // dbj 2009SEP03
-            var rez = "";
-            if (s_ instanceof Error) {
-                rez = s_.name + " " + "\nNumber : " + (s_.number & 0xFFFF) + "\nDescription : " + s_.description;
-            } else
-                rez = s_;
-            THIS.$display.val(THIS.$display.val() + (comment_begin + rez + comment_end));
-        },
-        print2: function (s) { dbj.later(function () { THIS.print_(s); }) },
-        ERR_CODE: 0x1313,
-        error: function (s) { THIS.print_(new Error(THIS.ERR_CODE, s)); return false; },
-        rx1: dbj.rx.c_style_comments,
-        rx2: dbj.rx.slashslash_comments,
-        rx3: dbj.rx.source_junk,
-        compress: function (o, total) {
-            if ("string" != typeof o) return THIS.error("Bad argument for THIS.compress()");
-            if (total || false)
-                try {
-                    return JSMIN("", o, 2);
-                } catch (x) {
-                    THIS.print_(x);
-                    return THIS.code_clean(o);
-                }
-            else
-                return THIS.code_clean(o);
-        },
-        code_clean: function (o) { return o.replace(/\n{2,}/mg, String.NL).replace(/[ ]{2,}/g, String.space).replace(THIS.rx1, String.empty); },
-        decompress: function (o, total) {
-            // for String.NL to work this has to be added to the value of the
-            // textarea, NOT the innerText !
-            return o.replace(/;/mg, ";" + String.NL).replace(/\{/mg, "{" + String.NL).replace(/\}/mg, "}" + String.NL);
-        },
-        code: function () {
-            return THIS.compress(THIS.$display.val(), true);
-            // return THIS.$display.val();
-        },
-        load_script: function (file_Name) {
-            ///<summary>
-            ///Use jQuery to load and activate the script
-            ///</summary>
-            $.getScript(file_Name, function () {
-                //@if (@_TRACE)
+	window.THIS = {
+		///<summary>
+		/// This application object
+		///</summary>
+		BUILD: "$Revision: 6 $$Date: 29/06/11 0:15 $",
+		display_id: "display",
+		$display: $("#display"),
+		toString: function () { return "DBJ*MicroPreter " + THIS.BUILD; },
+		thisYear: this_year,
+		title: "DBJ*Micropreter(tm) 2001-" + this_year,
+		print_: function (s_) {
+			s_ = s_ || ""; // dbj 2009SEP03
+			var rez = "";
+			if (s_ instanceof Error) {
+				rez = s_.name + " " + "\nNumber : " + (s_.number & 0xFFFF) + "\nDescription : " + s_.description;
+			} else
+				rez = s_;
+			THIS.$display.val(THIS.$display.val() + (comment_begin + rez + comment_end));
+		},
+		print2: function (s) { dbj.later(function () { THIS.print_(s); }) },
+		ERR_CODE: 0x1313,
+		error: function (s) { THIS.print_(new Error(THIS.ERR_CODE, s)); return false; },
+		rx1: dbj.rx.c_style_comments,
+		rx2: dbj.rx.slashslash_comments,
+		rx3: dbj.rx.source_junk,
+		compress: function (o, total) {
+			if ("string" != typeof o) return THIS.error("Bad argument for THIS.compress()");
+			if (total || false)
+				try {
+					return JSMIN("", o, 2);
+				} catch (x) {
+					THIS.print_(x);
+					return THIS.code_clean(o);
+				}
+			else
+				return THIS.code_clean(o);
+		},
+		code_clean: function (o) { return o.replace(/\n{2,}/mg, String.NL).replace(/[ ]{2,}/g, String.space).replace(THIS.rx1, String.empty); },
+		decompress: function (o, total) {
+			// for String.NL to work this has to be added to the value of the
+			// textarea, NOT the innerText !
+			return o.replace(/;/mg, ";" + String.NL).replace(/\{/mg, "{" + String.NL).replace(/\}/mg, "}" + String.NL);
+		},
+		code: function () {
+			return THIS.compress(THIS.$display.val(), true);
+			// return THIS.$display.val();
+		},
+		load_script: function (file_Name) {
+			///<summary>
+			///Use jQuery to load and activate the script
+			///</summary>
+			$.getScript(file_Name, function () {
+				//@if (@_TRACE)
                 THIS.print2(file_Name + ", Loaded");
                 //@end
-            });
-        },
+			});
+		},
 
-        //-----------------------------------------------------------------------
-        onload: function () {
+		//-----------------------------------------------------------------------
+		onload: function () {
 
-            function global_error_handlers() {
-                var j = arguments.length;
-                while (j--) {
-                    $(arguments[j]).error(function (msg, url, line) {
-                        THIS.print2("Error: " + msg + String.NL + url + String.NL + line);
-                    });
+			function global_error_handlers() {
+				var j = arguments.length;
+				while (j--) {
+					$(arguments[j]).error(function (msg, url, line) {
+						THIS.print2("Error: " + msg + String.NL + url + String.NL + line);
+					});
 
-                    $(arguments[j]).ajaxError(function (event, xhr, settings, thrownError) {
-                        THIS.print2("Ajax Error requesting: " + settings.url + (thrownError ? ", message: " + thrownError.message : ""));
-                        return false;
-                    });
-                }
-            }
+					$(arguments[j]).ajaxError(function (event, xhr, settings, thrownError) {
+						THIS.print2("Ajax Error requesting: " + settings.url + (thrownError ? ", message: " + thrownError.message : ""));
+						return false;
+					});
+				}
+			}
 
-            global_error_handlers(window, document, document.body);
-            //-----------------------------------------------------------------------
-            // apply every css property in arg object to the jQuery instance
-            jQuery.fn.cssApply = function (propobj) {
-                for (var prop in propobj) {
-                    this.css(prop, propobj[prop]);
-                }
-                return this;
-            };
-            //-----------------------------------------------------------------------
-            THIS.$display = $("#display");
-            THIS.load_script("dbjs/jsmin.js");
-            //-----------------------------------------------------------------------
-            var blanket_maker = (function ( /* element_to_be */_blanketed) {
+			global_error_handlers(window, document, document.body);
+			//-----------------------------------------------------------------------
+			// apply every css property in arg object to the jQuery instance
+			jQuery.fn.cssApply = function (propobj) {
+				for (var prop in propobj) {
+					this.css(prop, propobj[prop]);
+				}
+				return this;
+			};
+			//-----------------------------------------------------------------------
+			THIS.$display = $("#display");
+			THIS.load_script("dbjs/jsmin.js");
+			//-----------------------------------------------------------------------
+			var blanket_maker = (function ( /* element_to_be */_blanketed) {
 
-                var $blanket = $(document.body).append("<div id='blanket' style='background-color:white;display:none;overflow:auto; border:1px solid;padding:2px;position:absolute;top:0px;left:0px;z-index:99'><pre><code class='js' ></code></pre></div>").find("#blanket");
-                var $code = $blanket.find(".js");
-                $blanket.click(function (event) { $blanket.hide("slow"); });
+				var $blanket = $(document.body).append("<div id='blanket' style='background-color:white;display:none;overflow:auto; border:1px solid;padding:2px;position:absolute;top:0px;left:0px;z-index:99'><pre><code class='js' ></code></pre></div>").find("#blanket");
+				var $code = $blanket.find(".js");
+				$blanket.click(function (event) { $blanket.hide("slow"); });
 
-                return function (call_on_show) {
-                    if ("none" !== $blanket.css("display")) {
-                        $blanket.hide(0);
-                        $code.text('');
-                    } else {
-                        $blanket.cssApply({
-                            top: _blanketed.position().top,
-                            left: _blanketed.position().left,
-                            width: 1 + _blanketed.width(),
-                            height: _blanketed.height()
-                        });
-                        if ("function" === typeof call_on_show) call_on_show($code);
-                        $blanket.show();
-                    }
-                }
-            } (THIS.$display));
+				return function (call_on_show) {
+					if ("none" !== $blanket.css("display")) {
+						$blanket.hide(0);
+						$code.text('');
+					} else {
+						$blanket.cssApply({
+							top: _blanketed.position().top,
+							left: _blanketed.position().left,
+							width: 1 + _blanketed.width(),
+							height: _blanketed.height()
+						});
+						if ("function" === typeof call_on_show) call_on_show($code);
+						$blanket.show();
+					}
+				}
+			} (THIS.$display));
 
-            THIS.code_painter = function () {
-                blanket_maker(function (code_) {
-                    try {
-                        code_.text("/* click on this panel to edit the code */" + String.NL + THIS.$display.text()).chili();
-                    } catch (x) {
-                        THIS.print2(x);
-                    }
-                });
-            };
+			THIS.code_painter = function () {
+				blanket_maker(function (code_) {
+					try {
+						code_.text("/* click on this panel to edit the code */" + String.NL + THIS.$display.text()).chili();
+					} catch (x) {
+						THIS.print2(x);
+					}
+				});
+			};
 
-            //-----------------------------------------------------------------------
-            THIS.$display.rightMouseDown(function (E) {
-                if (E.altKey) {
-                    THIS.code_painter();
-                }
-                else
-                    this.val(THIS.compress(this.val(), E.ctrlKey));
-            });
-        }
-        //-----------------------------------------------------------------------
-    };
-    // POP(content) is avaliable for users
-    (function (oPopup) {
+			//-----------------------------------------------------------------------
+			THIS.$display.rightMouseDown(function (E) {
+				if (E.altKey) {
+					THIS.code_painter();
+				}
+				else
+					this.val(THIS.compress(this.val(), E.ctrlKey));
+			});
+		}
+		//-----------------------------------------------------------------------
+	};
+	// POP(content) is avaliable for users
+	(function (oPopup) {
 
-        var oPopBody = oPopup.document.body;
-        defualt_style = {
-            font: "small/1.5 verdana,arial,tahoma",
-            color: "black",
-            backgroundColor: "lightyellow",
-            border: "solid black 1px",
-            overflow: "auto",
-            padding: "5px"
-        };
+		var oPopBody = oPopup.document.body;
+		defualt_style = {
+			font: "small/1.5 'segoe ui',verdana,arial,tahoma",
+			color: "black",
+			backgroundColor: "lightyellow",
+			border: "solid black 1px",
+			overflow: "auto",
+			padding: "5px"
+		};
 
-        window.POP = function (content, style_opt) {
-            style_opt = style_opt || defualt_style;
-            content = content || String.empty;
-            if ((content === String.empty) || ("string" != typeof content)) {
-                return THIS.error("POP() needs string as the only argument.");
-            }
-            if (THIS.$display.length < 1) {
-                THIS.$display = $("#display");
-            }
+		window.POP = function (content, style_opt) {
+			style_opt = style_opt || defualt_style;
+			content = content || String.empty;
+			if ((content === String.empty) || ("string" != typeof content)) {
+				return THIS.error("POP() needs string as the only argument.");
+			}
+			if (THIS.$display.length < 1) {
+				THIS.$display = $("#display");
+			}
 
-            if (!!style_opt && typeof (style_opt) === "object")
-                for (var j in style_opt) {
-                    try {
-                        oPopBody.style[j] = style_opt[j]
-                    } catch (x) {
-                        THIS.error(x);
-                        continue;
-                    }
-                }
+			if (!!style_opt && typeof (style_opt) === "object")
+				for (var j in style_opt) {
+					try {
+						oPopBody.style[j] = style_opt[j]
+					} catch (x) {
+						THIS.error(x);
+						continue;
+					}
+				}
+			
+			if (!!window.POP.script) {
+				content += "<script type='text/javascript' src='" +
+				   window.POP.script +
+				   "' ></" + "script >";
+			}
 
-            oPopBody.innerHTML = content;
-            oPopup.show(0, 0, 8 + THIS.$display.width(), 8 + THIS.$display.height(), THIS.$display[0]);
-        }
-    })(window.createPopup());
-    //
+			oPopBody.innerHTML = content;
+			oPopup.show(0, 0, 8 + THIS.$display.width(), 8 + THIS.$display.height(), THIS.$display[0]);
+			return oPopBody; // DBJ 07-NOV-11
+		};
+
+		window.POP.script = "https://getfirebug.com/firebug-lite.js";
+
+	})(window.createPopup());
+	//
 })(this);
 
 //-----------------------------------------------------------------

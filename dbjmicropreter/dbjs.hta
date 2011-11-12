@@ -23,7 +23,6 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9" /> 
 <meta http-equiv="content-type" content="application/xhtml+xml; charset=iso-8859-1" />
 <!--##########################################################################################################-->
-
 	 <HTA:APPLICATION ID="oHTA"
 	 APPLICATIONNAME="dbj_javascript_micropreter"
 	 BORDER="thin"
@@ -90,27 +89,66 @@ div id='modal' style="behavior:url(dbj_modal_2.htc);" NOUNLOAD_MESSAGE="*** THIS
 </div> 
 <textarea id="display" wrap='off' tabindex="6" class="wide" title="Right click: remove c-style comments, CTRL+Right click: compress. ALT+Right click:decompress." ></textarea>
 </body>
-<script src="http://code.jquery.com/jquery-1.6.1.js" type="text/javascript" id="JQUERY161" onload="/* alert('JQUERY142 Loaded!') */" ></script>
-<script src="../lib/jquery.rightClick.js" type="text/javascript"></script>
-<script src="http://dbj.org/6/dbj.lib.js" type="text/javascript"></script>
-<script src="http://dbj.org/6/dbj.es5.js" type="text/javascript"></script>
-<script src="http://dbj.org/6/dbj.jquery.js" type="text/javascript"></script>
-<script src="http://dbj.org/6/dbj.xml.json.js" type="text/javascript"></script>
-<!--- *** --->
-<script src="../lib/chili/jquery.chili-2.2.js" type="text/javascript"></script>
-<script src="../lib/chili/recipes.js" type="text/javascript"></script>
-<!--- *** --->
-<script src="dbjs.js" type="text/javascript"></script>
-<script src="plugins/ado/ado.vbs" type="text/vbscript" ></script>
-<script src="plugins/ado/dbj.ado.vbs" type="text/vbscript" ></script>
-<script src="plugins/winsearch.js" type="text/javacript" ></script>
 <script type="text/javascript" >
-//-----------------------------------------------------------------------
-	dbj.addListener("load", function () {
+	(function (global, undefined) {
+
+		var uid = (+new Date()), result_name = "result_" + uid, stack_name = "stack_" + uid;
+		top[result_name] = null;
+		top[stack_name] = [];
+
+		function evil(x) {
+			"use strict";
+			(0, eval)(";top['" + result_name + "']=(" + x + ");");
+			return top[result_name];
+		}
+
+		function htmlEscape(str) {
+			return ("" + str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+		}
+
+		var X = function () {
+			if ("function" === typeof arguments[0]) {
+				arguments[0].apply(X, top[stack_name]);
+			}
+			else if (this.eval)
+				for (var r = "", s, j = 0; s = arguments[j++]; ) {
+					try { r = evil(s); } catch (x) { r = x + " "; }
+					top[stack_name].push("<li>" + s + "&nbsp;<b style='font-size:larger;'>&rarr;</b>&nbsp;(" + htmlEscape(r) + ")</li>");
+				} else
+				for (var r = "", s, j = 0; s = arguments[j++]; ) {
+					top[stack_name].push("<li>" + s + "</li>");
+				};
+			return X;
+		};
+
+		X.flush = function (cback) {
+			if (top[stack_name].length > 0) {
+				cback(top[stack_name].join("")); top[stack_name] = null; top[stack_name] = [];
+			}
+			return X;
+		};
+
+		global.P = function () {
+			X.apply({ "eval": false }, arguments); return global.P;
+		};
+
+		global.E = function () {
+			X.apply({ "eval": true }, arguments); return global.E
+		};
+
+	} (this || window));
+</script>
+
+<!--##########################################################################################################-->
+<script type="text/javascript" src="http://dbj.org/6/dbj.lod.js" ></script>
+<script type="text/javascript" >
+
+	//-----------------------------------------------------------------------
+	//dbj.addListener("load", function () {
+	all_is_ok_to_start = function () {
 		@if (@_DEBUG) debugger;	@end
 		//-----------------------------------------------------------------------
 		var shell = new ActiveXObject("WScript.Shell");
-		var cpu = shell.ExpandEnvironmentStrings("%PROCESSOR_ARCHITECTURE%").toLowerCase();
 		//-----------------------------------------------------------------------
 		THIS.onload();
 		main_event_handlers(THIS.$display);
@@ -130,26 +168,51 @@ div id='modal' style="behavior:url(dbj_modal_2.htc);" NOUNLOAD_MESSAGE="*** THIS
 		);
 
 		//ensure that all document elements except the display textarea are unselectable
-		$("*", document.body).each(
+		dbj.later(function () {
+			$("*", document.body).each(
 		 function (i) { this.unselectable = "on"; }
 		);
-		display.unselectable = "off"; display.focus();
+			display.unselectable = "off"; display.focus();
+		});
 
 		dbj.later(
 		function () { /*THIS.copyright_notice */
-			var msg = "\n" + THIS.title + "\t" + document.domain + " V:" + document.lastModified +
-			"\n" + dbj +
-			"\njQuery: " + $(document.body).jquery +
-			"\nhost: IE" + (document.documentMode ? document.documentMode : document.compatMode) +
-			"\nPROCESSOR_ARCHITECTURE : " + cpu +
-			"\n-------------------------------------------------------------------------- " +
-			"\n(c)" + THIS.thisYear + ", by DBJ.ORG (mailto:dbj@dbj.org)\n";
-			THIS.print2(msg);
-			});
-			ChiliBook.automatic = false;
-			ChiliBook.lineNumbers = false;
-});
-//-------------------------------------------------------------------------
+			P(THIS.title + "&nbsp;" + document.domain + " V:" + document.lastModified,
+			dbj + "",
+			"jQuery: " + $(document.body).jquery,
+			"host: IE" + (document.documentMode ? document.documentMode : document.compatMode),
+			"PROCESSOR_ARCHITECTURE : " + shell.ExpandEnvironmentStrings("%PROCESSOR_ARCHITECTURE%"),
+			"-------------------------------------------------------------------------- ",
+			"&copy;" + THIS.thisYear + ", by DBJ.ORG (mailto:dbj@dbj.org)",
+			"Scripts loaded:",
+			dbjdbj.reporter().join("<br/>")
+			);
+			P(function (stack) { this.flush(POP); });
+		});
+		ChiliBook.automatic = false;
+		ChiliBook.lineNumbers = true;
+	};
+	//-------------------------------------------------------------------------
+	//-----------------------------------------------------------------------
+	dbjdbj.load(
+			[
+			"http://code.jquery.com/jquery-git.js",
+			"../lib/jquery.rightClick.js",
+			"http://dbj.org/6/dbj.lib.js",
+			"http://dbj.org/6/dbj.es5.js",
+			"http://dbj.org/6/dbj.jquery.js",
+			"http://dbj.org/6/dbj.xml.json.js",
+			"../lib/chili/jquery.chili-2.2.js",
+			"../lib/chili/recipes.js",
+			"plugins/ado/ado.vbs",
+			"plugins/ado/dbj.ado.vbs",
+			"plugins/winsearch.js",
+			"dbjs.js"
+			],
+			function () { return !!window.jQuery && !!window.dbj && !!window.THIS; },
+			all_is_ok_to_start,
+			function () { alert("Could not load all scripts required?"); }
+);
 </script>
 <script type="text/vbscript">
 '-----------------------------------------------------------------------
@@ -176,8 +239,8 @@ function mBox(m_,n,t_)
 end function
 </script>
 <script type="text/javascript">
-			top.M$FT = top.M$FT || (/*@cc_on!@*/false);  
-			top.NL = top.NL || (M$FT ? "\r\n" : "\n");
+	top.M$FT = top.M$FT || (/*@cc_on!@*/false);
+	top.NL = top.NL || (M$FT ? "\r\n" : "\n");
 	if (top.M$FT) {
 		top.dbj = top.dbj || {};
 		dbj.mbox = (function () {
@@ -248,13 +311,11 @@ end function
 		/* helpers */
 		dbj.mbox.yesno = function (msg, onyes, onno) {
 			/* 6 is yes , 7 is no retval */
-			return  dbj.mbox({ "m" : msg, o : 4, "6" : onyes, "7" : onno });
+			return dbj.mbox({ "m": msg, o: 4, "6": onyes, "7": onno });
 		}
-}
+	}
 </script>
 </html>
-
-
-
-
-
+<!--##########################################################################################################-->
+<!--- script type="text/javascript" src="https://getfirebug.com/firebug-lite.js" onload="alert('Firebug Lite Loaded')"></script --->
+<!--##########################################################################################################-->
