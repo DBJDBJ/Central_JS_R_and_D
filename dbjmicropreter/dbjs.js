@@ -45,7 +45,7 @@
 					return THIS.code_clean(o);
 				}
 			else
-				return THIS.code_clean(o);
+				return THIS.code_clean(o);  
 		},
 		code_clean: function (o) { return o.replace(/\n{2,}/mg, String.NL).replace(/[ ]{2,}/g, String.space).replace(THIS.rx1, String.empty); },
 		decompress: function (o, total) {
@@ -194,139 +194,142 @@
 
 //-----------------------------------------------------------------
 var main_event_handlers = function ($display) {
-    //----------------------------------------------------------------- 
-    var sPersistValue = new String();
-    var file_filter = "JavaScript Files (*.js)|*.js|Text Files (*.txt)|*.txt";
-    //----------------------------------------------------------------- 
-    function check_content(msg) {
-        if (THIS.code().length < 3) {
-            THIS.print_(msg); return false;
-        }
-        return true;
-    }
-    //----------------------------------------------------------------- 
-    dugme_quit.onclick = function () {
-        dbj.mbox.yesno("Quit?",
+	//----------------------------------------------------------------- 
+	var sPersistValue = new String();
+	var file_filter = "JavaScript Files (*.js)|*.js|Text Files (*.txt)|*.txt";
+	//----------------------------------------------------------------- 
+	function check_content(msg) {
+		if (THIS.code().length < 3) {
+			THIS.print_(msg); return false;
+		}
+		return true;
+	}
+	//----------------------------------------------------------------- 
+	dugme_quit.onclick = function () {
+		dbj.mbox.yesno("Quit?",
         function () {
-            checkForSave();
-            CollectGarbage();
-            top.close();
+        	checkForSave();
+        	CollectGarbage();
+        	top.close();
         }
         );
 
-    }
-    //----------------------------------------------------------------- 
-    //SaveDocument uses the common dialog box object to display the save as dialog, 
-    //then writes a textstream object from the value of the div's innerHTML property
-    dugme_save.onclick = function () { SaveDocument(); }
-    function SaveDocument(e) {
-        //Setting CancelError to true and using try/catch allows the user to click
-        // cancel on the save as dialog without causing a script error
-        cDialog.CancelError = true;
-        try {
-            if (!check_content("Nothing to save...")) return;
-            cDialog.Filter = file_filter;
-            cDialog.ShowSave();
-            var fso = new ActiveXObject("Scripting.FileSystemObject");
-            var f = fso.CreateTextFile(cDialog.filename, true);
-            f.write(display.innerText);
-            f.Close();
-            sPersistValue = display.innerText;
-            //
-            document.title = cDialog.filename;
-            // dbj 2009-28-06
-            delete f;
-            delete fso;
-        }
-        catch (e) {
-            var sCancel = "true";
-            return sCancel;
-        }
-        display.focus();
-    }
-    //----------------------------------------------------------------- 
-    //LoadDocument uses the common dialog box object to display the open dialog box, 
-    //then reads the file and displays its contents in the div
-    dugme_load.onclick = function (e) {
-        function load_js() {
-            cDialog.Filter = file_filter;
-            cDialog.ShowOpen();
-            var ForReading = 1;
-            var fso = new ActiveXObject("Scripting.FileSystemObject");
-            var f = fso.OpenTextFile(cDialog.filename, ForReading);
-            var r = f.ReadAll();
-            f.close();
-            display.innerText = r;
-            //This variable is used in the checkForSave function to see if there 
-            //is new content in the div 
-            sPersistValue = display.innerText;
-            display.focus();
-            document.title = cDialog.filename;
-            //
-            THIS.code_painter();
-            // dbj 2009-08-17
-            delete f;
-            delete fso;
-        }
+	}
+	//----------------------------------------------------------------- 
+	//SaveDocument uses the common dialog box object to display the save as dialog, 
+	//then writes a textstream object from the value of the div's innerHTML property
+	dugme_save.onclick = function () { SaveDocument(); }
+	function SaveDocument(e) {
+		//Setting CancelError to true and using try/catch allows the user to click
+		// cancel on the save as dialog without causing a script error
+		cDialog.CancelError = true;
+		try {
+			if (!check_content("Nothing to save...")) return;
+			cDialog.Filter = file_filter;
+			cDialog.ShowSave();
+			var fso = new ActiveXObject("Scripting.FileSystemObject");
+			var f = fso.CreateTextFile(cDialog.filename, true);
+			f.write(display.innerText);
+			f.Close();
+			sPersistValue = display.innerText;
+			//
+			document.title = cDialog.filename;
+			// dbj 2009-28-06
+			delete f;
+			delete fso;
+		}
+		catch (e) {
+			var sCancel = "true";
+			return sCancel;
+		}
+		display.focus();
+	}
+	//----------------------------------------------------------------- 
+	//LoadDocument uses the common dialog box object to display the open dialog box, 
+	//then reads the file and displays its contents in the div
+	dugme_load.onclick = function (e) {
+		function load_js() {
+			cDialog.Filter = file_filter;
+			cDialog.ShowOpen();
+			var ForReading = 1;
+			var fso = new ActiveXObject("Scripting.FileSystemObject");
+			var f = fso.OpenTextFile(cDialog.filename, ForReading);
+			var r = f.ReadAll();
+			f.close();
+			display.innerText = r;
+			//This variable is used in the checkForSave function to see if there 
+			//is new content in the div 
+			sPersistValue = display.innerText;
+			display.focus();
+			document.title = cDialog.filename;
+			//
+			THIS.code_painter();
+			// dbj 2009-08-17
+			delete f;
+			delete fso;
+		}
 
-        //Setting CancelError to true and using try/catch allows the user to click cancel 
-        //on the save as dialog without causing a script error
-        cDialog.CancelError = true;
-        try {
-            load_js();
-        }
-        catch (e) {
-            THIS.print2(e);
-        }
-    }
-    //----------------------------------------------------------------- 
-    //NewDocument creates a new "document" by clearing the content of the div. 
-    //If there is any new content in the div, the user is asked whether or not to save
-    dugme_new.onclick = function () {
-        checkForSave();
-        display.focus();
-    }
-    //----------------------------------------------------------------- 
-    // This function checks to see if the div has new text, then displays a dialog box if appropriate
-    // on YES retursn TRUE, FALSE otherwise (on NO and CANCEL )
-    function checkForSave() {
-        try {
-            if (THIS.code() !== String.empty) {
-                    dbj.mbox.yesno("Save the current code?",
+		//Setting CancelError to true and using try/catch allows the user to click cancel 
+		//on the save as dialog without causing a script error
+		cDialog.CancelError = true;
+		try {
+			load_js();
+		}
+		catch (e) {
+			THIS.print2(e);
+		}
+	}
+	//----------------------------------------------------------------- 
+	//NewDocument creates a new "document" by clearing the content of the div. 
+	//If there is any new content in the div, the user is asked whether or not to save
+	dugme_new.onclick = function () {
+		checkForSave();
+		display.focus();
+	}
+	//----------------------------------------------------------------- 
+	// This function checks to see if the div has new text, then displays a dialog box if appropriate
+	// on YES retursn TRUE, FALSE otherwise (on NO and CANCEL )
+	function checkForSave() {
+		try {
+			if (THIS.code() !== String.empty) {
+				dbj.mbox.yesno("Save the current code?",
                         function () { SaveDocument(); THIS.$display.val(""); },
                         function () { THIS.$display.val(""); }
                 );
-            }
-        } catch (x) {
-                    THIS.print2(x); return false;
-        }
-        return true;
-    }
-    //-------------------------------------------------------------------------
-    window.onunload = function () {
-        checkForSave();
-    }
-    //-----------------------------------------------------------------
-    function dbj_eval(o) {
-        if (typeof o !== "string") {
-            throw THIS.error("eval(), can not evaluate non-strings?");
-        }
-        return eval("(" + o + ")");
-    }
-    //-----------------------------------------------------------------
-    $("#dugme_eval").click(function (E) {
-        try {
-            if (!check_content("Nothing to evaluate...")) return;
-            if (E.ctrlKey)
-                window.POP("" + dbj_eval(THIS.code()));
-            else
-                THIS.print2("" + dbj_eval(THIS.code())); // ""+ added by DBJ 2009-OCT-15
-        } catch (X) {
-            THIS.print2(X);
-        }
-    });
-    //-----------------------------------------------------------------
-};        // eof var main_event_handlers = function () {
+			}
+		} catch (x) {
+			THIS.print2(x); return false;
+		}
+		return true;
+	}
+	//-------------------------------------------------------------------------
+	window.onunload = function () {
+		checkForSave();
+	}
+	//-----------------------------------------------------------------
+	var RETVAL_PROPERTY_ = THIS.RETVAL_PROPERTY_ = '_dbj_micropreter_retval_' + Math.floor(Math.random() * 2147483648).toString(36);
+	function dbj_eval(o) {
+		"use strict";
+		if (typeof o !== "string") {
+			throw THIS.error("eval(), can not evaluate non-strings?");
+		}
+		(0, eval)(";top['" + RETVAL_PROPERTY_ + "']=(" + o + ");");
+		return top[RETVAL_PROPERTY_] ;
+	}
+	//-----------------------------------------------------------------
+	$("#dugme_eval").click(function (E) {
+		try {
+			if (!check_content("Nothing to evaluate...")) return;
+			if (E.ctrlKey)
+				window.POP("" + dbj_eval(THIS.code()));
+			else
+				THIS.print2("" + dbj_eval(THIS.code())); // ""+ added by DBJ 2009-OCT-15
+		} catch (X) {
+			THIS.print2(X);
+		}
+	});
+	//-----------------------------------------------------------------
+};         // eof var main_event_handlers = function () {
 
     var dbj_obj_maker = function(prog_id) {
         if ("undefined" === typeof window.ActiveXObject) {
