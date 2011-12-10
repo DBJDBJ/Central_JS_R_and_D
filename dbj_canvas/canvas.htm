@@ -17,9 +17,11 @@
 
    <body>
    <p id="toolbar">
-   <input type="text" id="SN_IN" />
-   <input type="text" id="DL_IN" />
-   <button id="DO_BTN" onclick="patt_draw(380, SN_IN.value, DL_IN.value)" >Show</button>
+   <input type="text" id="SN_IN" value="4" title="Number of sides" />
+   <input type="text" id="DL_IN" value="2"  />
+   <input type="text" id="USER_GIVEN_SIZE" value="380" title="Side of the canvas" />
+   <input type="text" id="USER_GIVEN_SIDE" value="100" title="Polygon side length" />
+   <button id="DO_BTN" >Show</button>
    </p>
    <h3>DBJ*Canvas</h3>
 </body>
@@ -105,42 +107,62 @@
 <script type="text/javascript">
 	onload = function () {
 		
-		composition_test(80);
+		// composition_test(80);
 
 	};
 </script>
 <script type="text/javascript">
 
-        top.patt_draw = function (size_, SN, DL ) {
-            var test_div = dbjct.before_test("DBJ*Patterner");
-            var canvas = dbjct.setupLayout(test_div, "DBJ*Hex", size_ = size_ || 80);
-            dbjct.print("Testing : patt_draw()");
+	(function () {
 
-            SN = SN || 4, DL = DL || 2 ;
+		function normalize(in_, dflt_, min_, max_, parser_) {
+			parser_ = parser_ || parseInt;
+			in_ = parser_(0 + in_);
+			if (0 == in_ || isNaN(in_)) in_ = dflt_;
+			if (in_ > max_) in_ = max_;
+			if (in_ < min_) in_ = min_;
+			return in_;
+		}
 
-            function poligon_sa_zbicama(C, R) {
-                canvas.drawPolygon({
-                    sides: SN, radius: R, x: C.x, y: C.y, strokeStyle: "black", strokeWidth: 1
-                })
+		$("#DO_BTN").click(function () {
+			// parameter normalization goes first
+			patt_draw(
+			 normalize(USER_GIVEN_SIDE.value, 100, 10, 999),
+			 normalize(USER_GIVEN_SIZE.value, 380, 100, 1024),
+			 normalize(SN_IN.value, 4, 3, 99),
+			 normalize(DL_IN.value, 0.5, 0.1, 99, parseFloat)
+			);
+		});
+		var patt_draw = function (side_, size_, SN, DL) {
+			var test_div = dbjct.before_test("DBJ*Patterner"),
+			canvas = dbjct.setupLayout(test_div, "DBJ*Hex", size_);
+			dbjct.print("Testing : patt_draw()");
+
+			function poligon_sa_zbicama(C, R) {
+				canvas.drawPolygon({
+					sides: SN, radius: R, x: C.x, y: C.y, strokeStyle: "black", strokeWidth: 1
+				})
                     .draw(function (ctx) {
-                        ctx.strokeStyle = "transparent";
-                        ctx.lineWidth = 1;
-                        $.each(LAST_POINT_SET, function (i, P) {
-                            ctx.dashedLine(C.x, C.y, P.x, P.y, DL);
-                            ctx.stroke();
-                        });
+                    	ctx.strokeStyle = "black";
+                    	ctx.lineWidth = 1;
+                    	LAST_POINT_SET.forEach( function (P,idx) {
+                    		ctx.dashedLine(C.x, C.y, P.x, P.y, DL);
+                    		ctx.stroke();
+                    	});
                     });
-            }
-            function run(C, a) {
-                if (a < 10) return;
-                poligon_sa_zbicama({ x: C.x, y: C.y }, a);
-                $.each(LAST_POINT_SET, function (i, P) {
-                    poligon_sa_zbicama({ x:parseInt(P.x), y: parseInt(P.y) }, a / 2);
-                    run(P, a / 2);
-                });
-            }
-            run({ x: parseInt(size_ / 2), y: parseInt(size_ / 2) }, 150);
-        }
+			}
+			function run(C, a) {
+				if (a < 10) return;
+				poligon_sa_zbicama({ x: C.x, y: C.y }, a);
+				LAST_POINT_SET.forEach(function (P, idx) { 
+					poligon_sa_zbicama({ x: parseInt(P.x), y: parseInt(P.y) }, a / 2);
+					run(P, a / 2);
+				});
+			}
+
+			run({ x: parseInt(size_ / 2), y: parseInt(size_ / 2) }, side_);
+		}
+	} ());
 </script>
 <script type="text/javascript" id="__dbj_misc_tests__">
 	function test_hexadraw(cvs) {
