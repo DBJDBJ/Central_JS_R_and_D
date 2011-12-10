@@ -18,7 +18,7 @@
 -->
 <head>
 <!--##########################################################################################################-->
-<!--		  Set document compatibility mode to IE8Mode                                                      -->
+<!--		  Set document compatibility mode to the top possible                                             -->
 <!----meta http-equiv="X-UA-Compatible" content="IE=edge" /--->
 <meta http-equiv="X-UA-Compatible" content="IE=9" /> 
 <meta http-equiv="content-type" content="application/xhtml+xml; charset=iso-8859-1" />
@@ -37,18 +37,17 @@
 	 VERSION="2011"
 	 WINDOWSTATE="normal"
 	 />
-
 		<Title>&nbsp;</Title>
 		<!--- meta name="vs_targetSchema" content="http://schemas.microsoft.com/intellisense/ie6" / --->
 		<meta http-equiv="Content-Type" content="text/html; charset=Windows-1252" />
 		<style type="text/css" media="screen">
 		object { display:none; }
-		html { height:99%; width:99%; }
+		html { height:100%; width:100%; }
 		body { width:100%; height:100%; overflow:hidden; background-color:buttonface; }
 		.wide { width:100%;}
 		.upleft { top:0; left:0; position:relative; }
 		.big { height:99%; }
-		.toolbar_button { font-family:verdana Tahoma; font-size:small; margin:3px; width:15%; }
+		.toolbar_button { font-family:"segoe ui" verdana Tahoma; font-size:small; margin:3px; width:15%; }
 		textarea#display { 
 				border:1px solid;  
 				padding:3px; overflow:auto; 
@@ -58,9 +57,8 @@
 				}
 		div#toolbar { background-color:buttonface; vertical-align:middle; }
 		</style>
-		
-	</HEAD>
-<body scroll="no" >
+</HEAD>
+<body scroll="no" oncontextmenu="false" >
 <!-- *** begin modal instantiation *** -->	
 <!---
 div id='modal' style="behavior:url(dbj_modal_2.htc);" NOUNLOAD_MESSAGE="*** THIS*MODAL Dialogue WARNING ***" NODEBUG 
@@ -89,140 +87,9 @@ div id='modal' style="behavior:url(dbj_modal_2.htc);" NOUNLOAD_MESSAGE="*** THIS
 </div> 
 <textarea id="display" wrap='off' tabindex="6" class="wide" title="Right click: remove c-style comments, CTRL+Right click: compress. ALT+Right click:decompress." ></textarea>
 </body>
-<script type="text/javascript" >
-	(function (global, undefined) {
-
-		var uid = (+new Date()), result_name = "result_" + uid, stack_name = "stack_" + uid;
-		top[result_name] = null;
-		top[stack_name] = [];
-
-		function evil(x) {
-			"use strict";
-			(0, eval)(";top['" + result_name + "']=(" + x + ");");
-			return top[result_name];
-		}
-
-		function htmlEscape(str) {
-			return ("" + str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-		}
-
-		var X = function () {
-			if ("function" === typeof arguments[0]) {
-				arguments[0].apply(X, top[stack_name]);
-			}
-			else if (this.eval)
-				for (var r = "", s, j = 0; s = arguments[j++]; ) {
-					try { r = evil(s); } catch (x) { r = x + " "; }
-					top[stack_name].push("<li>" + s + "&nbsp;<b style='font-size:larger;'>&rarr;</b>&nbsp;(" + htmlEscape(r) + ")</li>");
-				} else
-				for (var r = "", s, j = 0; s = arguments[j++]; ) {
-					top[stack_name].push("<li>" + s + "</li>");
-				};
-			return X;
-		};
-
-		X.flush = function (cback) {
-			if (top[stack_name].length > 0) {
-				cback(top[stack_name].join("")); top[stack_name] = null; top[stack_name] = [];
-			}
-			return X;
-		};
-
-		global.P = function () {
-			X.apply({ "eval": false }, arguments); return global.P;
-		};
-
-		global.E = function () {
-			X.apply({ "eval": true }, arguments); return global.E
-		};
-
-	} (this || window));
-</script>
-
 <!--##########################################################################################################-->
-<script type="text/javascript" src="http://dbj.org/6/dbj.lod.js" ></script>
-<script type="text/javascript" >
-
-	//-----------------------------------------------------------------------
-	//dbj.addListener("load", function () {
-	all_is_ok_to_start = function () {
-		@if (@_DEBUG) debugger;	@end
-		//-----------------------------------------------------------------------
-		var shell = new ActiveXObject("WScript.Shell");
-		//-----------------------------------------------------------------------
-		THIS.onload();
-		main_event_handlers(THIS.$display);
-		// THIS.plugins.load();
-		//-----------------------------------------------------------------------
-		document.title = THIS.title; // show some info as the window caption
-		// make access keys from first chars of each buttons text
-		$("button", toolbar).each(
-			function () {
-				var inner_text = this.innerText,
-				access_char = inner_text.substring(0, 1),
-				inner_html = '<span style="text-decoration:underline;">' + access_char + '</span>' +
-							inner_text.substr(1);
-				this.accessKey = access_char;
-				this.innerHTML = inner_html;
-			}
-		);
-
-		//ensure that all document elements except the display textarea are unselectable
-		dbj.later(function () {
-			$("*", document.body).each(
-		 function (i) { this.unselectable = "on"; }
-		);
-			display.unselectable = "off"; display.focus();
-		});
-
-		dbj.later(
-		function () { /*THIS.copyright_notice */
-			P(THIS.title + "&nbsp;" + document.domain + " V:" + document.lastModified,
-			dbj + "",
-			"jQuery: " + $(document.body).jquery,
-			"documentMode: " + document.documentMode,
-			"compatMode: " + document.compatMode );
-			for (i = 0; i < document.compatible.length; i++) {
-				P( " userAgent = " + document.compatible[i].userAgent + ", version   = " + document.compatible[i].version );
-			}
-			P("PROCESSOR_ARCHITECTURE : " + shell.ExpandEnvironmentStrings("%PROCESSOR_ARCHITECTURE%"),
-			"-------------------------------------------------------------------------- ",
-			"&copy;" + THIS.thisYear + ", by DBJ.ORG (mailto:dbj@dbj.org)",
-			"-------------------------------------------------------------------------- ",
-			"Scripts loaded:",
-			dbjdbj.reporter().join("<br/>")
-			);
-			P(function (stack) { this.flush(POP); });
-		});
-		ChiliBook.automatic = false;
-		ChiliBook.lineNumbers = true;
-	};
-	//-------------------------------------------------------------------------
-	//-----------------------------------------------------------------------
-	dbjdbj.load(
-			[
-			"http://code.jquery.com/jquery-git.js",
-			"../lib/jquery.rightClick.js",
-			"http://dbj.org/6/dbj.lib.js",
-			"http://dbj.org/6/dbj.es5.js",
-			"http://dbj.org/6/dbj.jquery.js",
-			"http://dbj.org/6/dbj.xml.json.js",
-			"../lib/chili/jquery.chili-2.2.js",
-			"../lib/chili/recipes.js",
-/*
-			"plugins/ado/ado.vbs",
-			"plugins/ado/dbj.ado.vbs",
-			"plugins/winsearch.js",
-*/
-			"dbjs.js"
-			],
-			function () { return !!window.jQuery && !!window.dbj && !!window.THIS; },
-			all_is_ok_to_start,
-			function () { alert("Could not load all scripts required?"); }
-);
-</script>
-<script type="text/vbscript">
-'-----------------------------------------------------------------------
+<script type="text/vbscript" id="dbj_mbox_vbs_">
+' -----------------------------------------------------------------------
 Function DisplayCustomError(strMessage)
 	'Display custom message and information from VBScript Err object.
 	dim strError : strError = VbCrLf & strMessage & VbCrLf & _
@@ -233,8 +100,8 @@ Function DisplayCustomError(strMessage)
 	Err.Clear
 	DisplayCustomError = MsgBox(strError,16,"DBJ VBScript Error Box")
 End Function
-'------------------------------------------------------------------------
-function mBox(m_,n,t_)
+' ------------------------------------------------------------------------
+Function mBox(m_,n,t_)
 	On Error Resume Next
 			dim x : x=MsgBox(m_,n, t_)
 			If Err = 0 Then
@@ -243,84 +110,39 @@ function mBox(m_,n,t_)
 					dim  strMessage : strMessage = "VBS ERROR: Inside mBox()"
 					mBox = DisplayCustomError(strMessage)
 			End If
-end function
+End Function
 </script>
-<script type="text/javascript">
-	top.M$FT = top.M$FT || (/*@cc_on!@*/false);
-	top.NL = top.NL || (M$FT ? "\r\n" : "\n");
-	if (top.M$FT) {
-		top.dbj = top.dbj || {};
-		dbj.mbox = (function () {
-
-			var retvals = {
-				/* VBScript msg box can return" */
-				"1": "vbOK - OK was clicked",
-				"2": "vbCancel - Cancel was clicked ",
-				"3": "vbAbort - Abort was clicked",
-				"4": "vbRetry - Retry was clicked",
-				"5": "vbIgnore - Ignore was clicked",
-				"6": "vbYes - Yes was clicked",
-				"7": "vbNo - No was clicked"
-			},
-			buttons = {
-				/* buttons argument is one of these integers: */
-				"1": "OK and Cancel buttons",
-				"2": "Abort, Retry, and Ignore buttons",
-				"3": "Yes, No, and Cancel  buttons",
-				"4": "Yes and No buttons",
-				"5": "Retry and Cancel buttons"
-			},
-			icons = {
-				/* To show icons bellow add the number to the buttons number above */
-				"16": "Critical message icon",
-				"32": "Warning Query icon",
-				"48": "Warning Message icon",
-				"64": "Information Message"
-			},
-			default_title = "DBJ.ORG Message Box";
-			function hlp() {
-				function o2s(o_) {
-					var r = [];
-					for (var p in o_) r.push(p + " : " + o_[p]);
-					return r.join(top.NL);
-				}
-				var s = ["retval = dbj.mbox( message, title, option)", "Return Values", o2s(retvals), "Option arguments is integer which is one of ", "Buttons", o2s(buttons), "Plus one of these", "Icons", o2s(icons)]
-				mBox(s.join(top.NL), 65, default_title);
-			}
-			function popit(m_, o_, t_) {
-				if (!m_) return hlp(); /* No message given, assuming debugging */
-				t_ = t_ || default_title;
-				o_ = o_ || 1;
-				return mBox(m_, o_, t_);
-			}
-			/*
-			opts object 
-			*/
-			var default_ /*options*/ = {
-				m: null,
-				o: 1,
-				t: "DBJ.ORG Message Box",
-				"1": function () { return "vbOK - OK was clicked"; },
-				"2": function () { return "vbCancel - Cancel was clicked "; },
-				"3": function () { return "vbAbort - Abort was clicked"; },
-				"4": function () { return "vbRetry - Retry was clicked"; },
-				"5": function () { return "vbIgnore - Ignore was clicked"; },
-				"6": function () { return "vbYes - Yes was clicked"; },
-				"7": function () { return "vbNo - No was clicked"; }
-			}
-			return function (opts) {
-				opts = opts || {};
-				/* use default opts where necessary */
-				for (var p in default_) opts[p] = opts[p] || default_[p];
-				return opts[popit(opts.m, opts.o, opts.t)]();
-			}
-		} ());
-		/* helpers */
-		dbj.mbox.yesno = function (msg, onyes, onno) {
-			/* 6 is yes , 7 is no retval */
-			return dbj.mbox({ "m": msg, o: 4, "6": onyes, "7": onno });
-		}
-	}
+<script type="text/javascript" src="http://dbj.org/6/dbj.lod.js" ></script>
+<script type="text/javascript" >
+//@cc_on
+//@set @_DEBUG =(1==0)
+//@set @_TRACE =(1==0)
+//-------------------------------------------------------------------------
+@if (@_DEBUG) debugger;	@end
+//-----------------------------------------------------------------------
+	dbjdbj.load(
+			[
+			"http://code.jquery.com/jquery-git.js",
+			"../lib/jquery.rightClick.js",
+			"http://dbj.org/6/dbj.lib.js",
+			"http://dbj.org/6/dbj.es5.js",
+			"http://dbj.org/6/dbj.jquery.js",
+			"http://dbj.org/6/dbj.xml.json.js",
+			"../lib/chili/jquery.chili-2.2.js",
+			"../lib/chili/recipes.js",
+	/*
+	"plugins/ado/ado.vbs",
+	"plugins/ado/dbj.ado.vbs",
+	"plugins/winsearch.js",
+	*/
+			"dbjs.js",
+			"dbjs/dbjs.mbox.js",
+			"dbjs/dbjs.start.js"
+			],
+			function () { return !!window.jQuery && !!window.dbj && !!window.THIS && !!window.all_is_ok_to_start; },
+			function () { all_is_ok_to_start(); }
+			/*, function () { alert("Could not load all scripts required?"); }*/
+);
 </script>
 </html>
 <!--##########################################################################################################-->

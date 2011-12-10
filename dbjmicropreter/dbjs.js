@@ -54,8 +54,8 @@
 			return o.replace(/;/mg, ";" + String.NL).replace(/\{/mg, "{" + String.NL).replace(/\}/mg, "}" + String.NL);
 		},
 		code: function () {
-			return THIS.compress(THIS.$display.val(), true);
-			// return THIS.$display.val();
+			//return THIS.compress(THIS.$display.val(), true);
+			return THIS.$display.val();
 		},
 		load_script: function (file_Name) {
 			///<summary>
@@ -186,11 +186,11 @@
 			return oPopBody; // DBJ 07-NOV-11
 		};
 
-		window.POP.script = null; // "https://getfirebug.com/firebug-lite.js";
+		window.POP.script = "https://getfirebug.com/firebug-lite.js";
 
 	})(window.createPopup());
 	//
-})(this);
+}(this));
 
 //-----------------------------------------------------------------
 var main_event_handlers = function ($display) {
@@ -309,12 +309,15 @@ var main_event_handlers = function ($display) {
 	//-----------------------------------------------------------------
 	var RETVAL_PROPERTY_ = THIS.RETVAL_PROPERTY_ = '_dbj_micropreter_retval_' + Math.floor(Math.random() * 2147483648).toString(36);
 	function dbj_eval(o) {
-		"use strict";
 		if (typeof o !== "string") {
 			throw THIS.error("eval(), can not evaluate non-strings?");
 		}
-		(0, eval)(";top['" + RETVAL_PROPERTY_ + "']=(" + o + ");");
-		return top[RETVAL_PROPERTY_] ;
+		/*
+		"use strict";
+		(0, eval)("top['" + RETVAL_PROPERTY_ + "'] = (" + o + ")");
+		return top[RETVAL_PROPERTY_];
+		*/
+		return eval(o);
 	}
 	//-----------------------------------------------------------------
 	$("#dugme_eval").click(function (E) {
@@ -329,7 +332,7 @@ var main_event_handlers = function ($display) {
 		}
 	});
 	//-----------------------------------------------------------------
-};         // eof var main_event_handlers = function () {
+};           // eof var main_event_handlers = function () {
 
     var dbj_obj_maker = function(prog_id) {
         if ("undefined" === typeof window.ActiveXObject) {
