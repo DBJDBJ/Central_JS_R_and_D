@@ -18,8 +18,8 @@
    <body>
    <p id="toolbar">
    <input type="text" id="SN_IN" value="4" title="Number of sides" />
-   <input type="text" id="DL_IN" value="2"  />
-   <input type="text" id="USER_GIVEN_SIZE" value="380" title="Side of the canvas" />
+   <input type="text" id="DL_IN" value="10" title="Dashed line dahs length" />
+   <input type="text" id="USER_GIVEN_SIZE" value="1200" title="Side of the canvas" />
    <input type="text" id="USER_GIVEN_SIDE" value="100" title="Polygon side length" />
    <button id="DO_BTN" >Show</button>
    </p>
@@ -128,9 +128,9 @@
 			// parameter normalization goes first
 			patt_draw(
 			 normalize(USER_GIVEN_SIDE.value, 100, 10, 999),
-			 normalize(USER_GIVEN_SIZE.value, 380, 100, 1024),
+			 normalize(USER_GIVEN_SIZE.value, 600, 100, 1200),
 			 normalize(SN_IN.value, 4, 3, 99),
-			 normalize(DL_IN.value, 0.5, 0.1, 99, parseFloat)
+			 normalize(DL_IN.value, 0.5, 0.1, 999, parseFloat)
 			);
 		});
 		var patt_draw = function (side_, size_, SN, DL) {
