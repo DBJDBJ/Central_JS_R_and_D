@@ -7,8 +7,8 @@
 		type="text/css" />
 	<style type="text/css" media="all">
 	body { cursor:auto; }
-.dbj_on      { border:1px solid black; width:5mm; margin-left:3px; margin-right:13px; background-color:Red; }
-.dbj_off     { border:1px solid black; width:5mm; margin-left:3px; margin-right:13px; background-color:transparent; }
+.dbj_on      { border:1px solid black; width:50px; margin-left:3px; margin-right:13px; background-color:Red; }
+.dbj_off     { border:1px solid black; width:50px; margin-left:3px; margin-right:13px; background-color:transparent; }
 button       { font-size:larger; text-align:left; padding:3px 3px 3px 13px; margin:1px; width:200px; }
 .dbj_sound   {/* Use this to tag the elements to be used by dbj-dbj_sound plugin. An empty class*/}
 #documentation #licence { width:99%; }
@@ -45,9 +45,9 @@ button       { font-size:larger; text-align:left; padding:3px 3px 3px 13px; marg
 </fieldset>
 <fieldset style="clear:both" >
 <legend >Control</legend>
-<button >Play</button>
-<button >Loop</button>
-<button id="toggle" style="width:300px" >Master Switch</button>
+<button id="play" >Play</button>
+<button id="loop" >Loop</button>
+<button id="master" style="width:300px" >Master Switch</button>
 </fieldset>
 </div>
 <!------------------------------------------------------------------------------->
@@ -77,17 +77,23 @@ button       { font-size:larger; text-align:left; padding:3px 3px 3px 13px; marg
 <div id="api-pivot">
  <h3>API</h3>
 <pre id="API" class='jush jush-js'>  
-    $.dbj_sound.url( host_element ) // return sound file url from host element. host must be valid html element with attribute href present
+    $.dbj_sound.url( host_element ) 
+	// return sound file url from host element. host must be valid html element with attribute href present
  
-    $.dbj_sound.play( host_element, looping ) // play a sound as defined by the href of the host_element. if looping arg present, then loop
+    $.dbj_sound.play( host_element, looping ) 
+	// play a sound as defined by the href of the host_element. if looping arg present, then loop
  
-    $.dbj_sound.loop( host_element ) // loop (play and repeat "forever") a sound as defined by the href of the host_element
+    $.dbj_sound.loop( host_element ) 
+	// loop (play and repeat "forever") a sound as defined by the href of the host_element
  
-    $.dbj_sound.stop( host_element ) // stop a playback of the sound from the href of the host_element
+    $.dbj_sound.stop( host_element ) 
+	// stop a playback of the sound from the href of the host_element
   
-    $.dbj_sound.playing( host_element ) // return true if sounds are on and sound defined by href of the host_element is playing
+    $.dbj_sound.playing( host_element ) 
+	// return true if sounds are on and sound defined by href of the host_element is playing
   
-    $.dbj_sound.enabledisable( host_element ) // toggle on/off all sounds on the current page, controlled by this plugin
+    $.dbj_sound.enabledisable( host_element ) 
+	// toggle on/off all sounds on the current page, controlled by this plugin
     
     // V 1.0.3
     $.dbj_sound.cache(
@@ -146,7 +152,7 @@ button       { font-size:larger; text-align:left; padding:3px 3px 3px 13px; marg
 			return false;
 		});
 
-		$("#toggle").click(function () {
+		$("#master").click(function () {
 			$.dbj_sound.enabledisable();
 			if ($.dbj_sound.enabled) {
 				$(this).text("Enable Sounds");
@@ -157,6 +163,15 @@ button       { font-size:larger; text-align:left; padding:3px 3px 3px 13px; marg
 			}
 		})
 
+		$("#play,#loop").click(function () {
+			$.dbj_sound.enabledisable();
+			if ($.dbj_sound.enabled) {
+				prefixor_.flip(this, true);
+			} else {
+				prefixor_.flip(this, false);
+			}
+		})
+
 
 		//-------------------------------------------
 		function prefixor(flipping_logic) {
@@ -164,8 +179,8 @@ button       { font-size:larger; text-align:left; padding:3px 3px 3px 13px; marg
 			//if ("function" !== typeof flipping_logic) throw new Err(0xFF, "prefixor() needs flipping logic function as a single argument");
 
 			var toggle_prefix_marker = "toggle_prefix_marker",
-			on_ = "<span class='dbj_on' >&nbsp</span>",
-			    off_ = "<span class='dbj_off' >&nbsp</span>",
+			on_ = "<span class='dbj_on' >&nbsp;&nbsp;</span>",
+			    off_ = "<span class='dbj_off' >&nbsp;&nbsp;</span>",
 				flipper_ = flipping_logic || function () { return true; };
 
 			function flip_logic_(jq_element, force_on_off) {
@@ -174,7 +189,10 @@ button       { font-size:larger; text-align:left; padding:3px 3px 3px 13px; marg
 			}
 
 			return {
-				flip: function (jq_element, force_on_off /* optional true or false */) {
+				flip: function (jq_element,
+								force_on_off /* optional true or false */,
+								force_text   /* used only if force_on_off given */
+								) {
 					if (flip_logic_(jq_element, force_on_off)) {
 						$(jq_element).find("span").attr("class", "dbj_on");
 					}
