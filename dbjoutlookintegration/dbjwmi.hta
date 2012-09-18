@@ -12,16 +12,14 @@ body {
 </head>
 <body id="TELO" >
 </body>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3/jquery.min.js" type="text/javascript" id="JQ.1.3" ></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js" type="text/javascript" id="JQ.1.3" ></script>
 <script type="text/javascript" id="dbj_lib">
 	//
 	//
-	function printline() { print("\n-----------------------------------------------------------------------"); };
+	function dbj_printline() { dbj_print("\n-----------------------------------------------------------------------"); };
 	//
-	function print(str) {
+	function dbj_print(str) {
 	
-	var tid = setTimeout( function () { clearTimeout(tid) ;
-
 		function who_called(F, x) {
 			try {
 				var who = F.caller.toString().match(/\w+/g);
@@ -31,28 +29,29 @@ body {
 			}
 		}
 
-
-		var html = new String();
-		if (null == str)
-			$("#TELO").text("");
-		else
-			if (str instanceof Error) {
-			html = "<hr>" + str;
-			html += "<br>" + (str.number & 0xFFFF);
-			html += "<br>" + (str.description);
-			html += "<br>Thrown from : " + who_called(print);
-			html = html.fontcolor("red");
-			html = html.bold();
+		function inner_ () {
+			var html = new String();
+			if (null == str) {
+				$("#TELO").text("");
+			}
+			else if (str instanceof Error) {
+				html = "<hr/>" + str;
+				html += "<br/>" + (str.number & 0xFFFF);
+				html += "<br/>" + (str.description);
+				html += "<br/>Thrown from : " + who_called(dbj_print);
+				html = html.fontcolor("red");
+				html = html.bold();
+			}
+			else {
+				html = str;
+			}
+			$("#TELO").append(html);
 		}
-		else
-			html = str;
 
-		$("#TELO").append(html);
-		
-		), 1 ) ; // eof set TimeOut
-	}
+		return setTimeout(inner_, 1);
+}
 </script>
-<script language=javascript >
+<script type="text/javascript" >
 //
 // DBJ		Created
 //--------------------------------------------------
@@ -68,22 +67,22 @@ window.onload = function (x)
 	var ADSI_TEST = true ;
 	try {
 
-		print("<h5>Loaded [" + (new Date()).toLocaleString() + "]<h5>");
-		if (ADSI_TEST != null )				
+		dbj_print("<h5>Loaded [" + (new Date()).toLocaleString() + "]<h5>");
+		if (ADSI_TEST)				
 		{
-			debugger;
-			print( adsi_users_list() );
+			// debugger;
+			dbj_print( adsi_users_list() );
 		} else {
 				    var SWS = GetObject("winmgmts:");				
-				    print( show_login_profiles(SWS) ) ;
-					print("<h5>Logon Sessions<h5>");
-					print( show_Win32_LogonSession(SWS) ) ;
-					print( class_properties("Win32_LogonSession")) ;
+				    dbj_print( show_login_profiles(SWS) ) ;
+					dbj_print("<h5>Logon Sessions<h5>");
+					dbj_print( show_Win32_LogonSession(SWS) ) ;
+					dbj_print( class_properties("Win32_LogonSession")) ;
 					// throw new Error(0xFF, "DBJ*Error") ;
 		}
 	}
 	catch (x) {
-	 print( x ) ;
+	 dbj_print( x ) ;
 	}
 }
 //--------------------------------------------------
@@ -243,7 +242,7 @@ function get_properties ( adso, result )
 //
 function adsi_users_list ( result,x )
 {
-	result = new String() ;
+var	result = new String() ;
 var sysnfo = new sysinfo()	;
 var machine = sysnfo.computer ;
 var myUsers = GetObject("WinNT://" + machine + "/users") ;
@@ -251,12 +250,12 @@ var member = null ;
 
 	myUsers.GetInfo() ;
 	
-	print( "<h5>Mandatory properties of " + myUsers.ADsPath + "</h5>" ) ;
-	print( get_properties( myUsers ) ) ;
+	dbj_print( "<h5>Mandatory properties of " + myUsers.ADsPath + "</h5>" ) ;
+	dbj_print( get_properties( myUsers ) ) ;
 	var members = myUsers.Members() ;
 	var members_name = members.Name ;
 	var members_type = members.ADsType ;
-	print( "<h5>" + members.Count + " Users</h5>" ) ;
+	dbj_print( "<h5>" + members.Count + " Users</h5>" ) ;
 	
 	for( var e = new Enumerator( members ) ; e.atEnd(); e.moveNext() )
 	{
