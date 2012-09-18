@@ -35,12 +35,10 @@ body {
 				$("#TELO").text("");
 			}
 			else if (str instanceof Error) {
-				html = "<hr/>" + str;
-				html += "<br/>" + (str.number & 0xFFFF);
-				html += "<br/>" + (str.description);
+				html = "<hr/>" + str + (str.number & 0xFFFF) + " :: " + (str.description);
 				html += "<br/>Thrown from : " + who_called.call(this,dbj_print);
 				html = html.fontcolor("red");
-				html = html.bold();
+				// html = html.bold();
 			}
 			else {
 				html = str;
@@ -56,9 +54,8 @@ body {
 // DBJ		Created
 //--------------------------------------------------
 // eval the exp given in an async manner
-function async_eval ( exp )
-{
-	var tid = window.setTimeout(function() { clearTimeout(tid); eval(exp); }, 1);
+function async_eval ( exp ) {
+	var tid = window.setTimeout(function() { clearTimeout(tid); evalex.call(this,exp); }, 1);
 }
 //
 //--------------------------------------------------
@@ -233,7 +230,7 @@ function get_properties ( adso, result )
 		foreach_property(schema.MandatoryProperties, collect);
 		foreach_property(schema.OptionalProperties, collect);
 		foreach_property(schema.NamingProperties, collect) 
-	} catch (x) {dbj_print(x);}
+	} catch (x) {dbj_print.call(this,x);}
 		
 		return result ;
 }
@@ -245,24 +242,24 @@ function adsi_users_list ( result,x )
 var	result = new String() ;
 var sysnfo = new sysinfo()	;
 var machine = sysnfo.computer ;
-var myUsers = GetObject("WinNT://" + machine + "/users") ;
+var myUsers = evalex.call(this,'GetObject("WinNT://"' + machine + '"/users")') ;
 var member = null ;
 
 	myUsers.GetInfo() ;
-	
-	dbj_print( "<h5>Mandatory properties of " + myUsers.ADsPath + "</h5>" ) ;
+
+	dbj_print("<h5>Mandatory properties of " + evalex.call(myUsers, 'myUsers.ADsPath') + "</h5>");
 	dbj_print( get_properties( myUsers ) ) ;
-	var members = myUsers.Members() ;
-	var members_name = members.Name ;
-	var members_type = members.ADsType ;
-	dbj_print( "<h5>" + members.Count + " Users</h5>" ) ;
+	var members = evalex.call(myUsers, 'myUsers.Members()') ;
+	var members_name = evalex.call(members, 'members.Name');
+	var members_type = evalex.call(members, 'members.ADsType');
+	dbj_print("<h5>" + evalex.call(members, 'members.Count') + " Users</h5>");
 	
 	for( var e = new Enumerator( members ) ; e.atEnd(); e.moveNext() )
 	{
 		member = e.item() ;
-		result += "<li>User : " 
-		             + evalex.call(this, member.Name) 
-		       + "[" + evalex.call(this,member.Class) + "]" ;
+		result += "<li>User : "
+		             + evalex.call(member, 'member.Name')
+		       + "[" + evalex.call(member, 'member.Class') + "]";
 	}
 	return result ;
 }
@@ -272,8 +269,8 @@ function evalex(ex) {
 	try {
 		retval = eval("(" + ex + ")");
 	} catch (x) {
-	dbj_print(x);
-	retval = x + "";
+	dbj_print.call(this,x);
+	retval = "ERROR is made by :: " + ex;
 }
 return retval;
 }
