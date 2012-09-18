@@ -38,7 +38,7 @@ body {
 				html = "<hr/>" + str;
 				html += "<br/>" + (str.number & 0xFFFF);
 				html += "<br/>" + (str.description);
-				html += "<br/>Thrown from : " + who_called(dbj_print);
+				html += "<br/>Thrown from : " + who_called.call(this,dbj_print);
 				html = html.fontcolor("red");
 				html = html.bold();
 			}
@@ -229,11 +229,11 @@ function get_properties ( adso, result )
 	}
 	
 	schema.GetInfo();
-	foreach_property(schema.MandatoryProperties, collect ) ;
-	foreach_property(schema.OptionalProperties, collect ) ;
 	try {
-	foreach_property(schema.NamingProperties, collect ) 
-	} catch (x) { /* not implemented */ }
+		foreach_property(schema.MandatoryProperties, collect);
+		foreach_property(schema.OptionalProperties, collect);
+		foreach_property(schema.NamingProperties, collect) 
+	} catch (x) {dbj_print(x);}
 		
 		return result ;
 }
@@ -260,9 +260,23 @@ var member = null ;
 	for( var e = new Enumerator( members ) ; e.atEnd(); e.moveNext() )
 	{
 		member = e.item() ;
-		result += "<li>User : " +  member.Name + "[" + member.Class + "]" ;
+		result += "<li>User : " 
+		             + evalex.call(this, member.Name) 
+		       + "[" + evalex.call(this,member.Class) + "]" ;
 	}
 	return result ;
 }
+//
+function evalex(ex) {
+	var retval = null;
+	try {
+		retval = eval("(" + ex + ")");
+	} catch (x) {
+	dbj_print(x);
+	retval = x + "";
+}
+return retval;
+}
+//
 </script>
 </html>
