@@ -5,8 +5,7 @@ $Revision: 1 $
 $Date: 22/12/09 17:10 $
 -->
 <head>
-<script src="http://dbj.org/6/dbj.log.js" type="text/javascript" ></script>
- <title>DBJ*AsyncResult&trade; &copy;2009 by DBJ.ORG</title>
+ <title>DBJ*AsyncResult&trade; &copy;2009-2013 by DBJ.ORG</title>
 <style type="text/css" >
 	body { font: small/1.5 verdana; }
 	.dbj_li {}
@@ -41,10 +40,9 @@ $Date: 22/12/09 17:10 $
 <li class='dbj_li' >    <b>tbody</b>:<span class='dbj_rezult'></span> Is equal to true if the browser allows table elements without tbody elements (is currently false in IE, which automatically inserts tbody if it is not present).</li>
 </ul></li></div>
 <hr />
-<p class='dbj_footer'>This page &copy; 2009 by <a href="http://dbj.org">DBJ.ORG&trade;</a> </p>
+<p class='dbj_footer'>This page &copy; 2009-2013 by <a href="http://dbj.org">DBJ.ORG&trade;</a> </p>
 </body>
-<script src="http://code.jquery.com/jquery-1.6.4.min.js" type="text/javascript" id="JQ.1.6.4" ></script>
-<script src="http://www.json.org/json2.js" type="text/javascript" ></script>
+<script src="http://code.jquery.com/jquery-1.9.1.min.js" type="text/javascript" id="JQ.1.9.1" ></script>
 <script src="http://dbj.org/6/dbj.lib.js" type="text/javascript"></script>
 <script type="text/javascript" id="this_page_main_script" >
 	$(function() {
@@ -82,34 +80,26 @@ function spawn ( )
 {
 	var AsyncResult = function(args_) {
 
-		var FP = args_[0].worker;
-		var tu = parseInt(args_[0].tu === null ? 1 : args_[0].tu);
-		tu = (tu > spawn.maxdelay ? spawn.maxdelay : tu)
-		var CB = args_[0].callback;
+	    // preserve the current instance aka 'this' in 'that'
+	    var that = this,
+	        FP = args_[0].worker || null ,
+		    tu = parseInt(args_[0].tu || 1 ),
+		    CB = args_[0].callback || null ;
 
-		// create properties on the curent instance
+		tu = (tu > spawn.maxdelay ? spawn.maxdelay : tu);
+	    // create properties on the curent instance
 		this.done = false;
 		this.retval = null;
 		this.tid = null;
 		this.callback = CB;
-		// preserve the current instance aka 'this' in 'that'
-		var that = this;
 		// transform arguments to array and cut the first element
 		// thus leaving arguments for FP
 		that.args = Array.prototype.slice.call(args_).slice(1);
 
-		// be 'future proof'
-		// http://wiki.ecmascript.org/doku.php?id=proposals:json_encoding_and_decoding&s=tojsonstring
-		// and use
-		// http://www.json.org/json2.js
-		this.toJSONString = function() {
-			return JSON.stringify(that);
-		}
-
 		this.toString = function() {
 			// return JSON formated object exposing private properties
 			// NOTE: this idiom exposes private properties without the need for get/set methods
-		return this.toJSONString();
+		    return JSON.stringify(that);
 		}
 		// this private method is delay executed *outside* of the context of the current instance
 		// it is executed in the context of the 'global space' aka the 'window' object
@@ -126,7 +116,7 @@ function spawn ( )
 				that.done = false;
 			}
 			// for testing purposes show the state of the AsyncResult instance
-			if (spawn.log) spawn.log("AsyncResult::doit()\n\n" + that);
+			spawn.log("AsyncResult::doit()\n\n" + that);
 			// use clearInterval to release the timer ID
 			clearTimeout(that.tid);
 			// use the callback , if given
@@ -150,7 +140,9 @@ function spawn ( )
       spawn.maxdelay = 60 * 1000; // aka one minute
       // if null will not be used
       // otherwise must be a function with a single string argument
-      spawn.log = null ;
+      spawn.log = function () { 
+          console.log(arguments[0]);
+      } ;
       </script>
 <script type="text/javascript" id="async_test" >
 	$("#test1btn").click(
@@ -183,13 +175,13 @@ function() {
 	}
 
 	function show_test_image(image_url) {
-		$("#test_image").find("img").attr("src", image_url);
-		$("#test_image").attr("href", image_url);
+	    $test_image.find("img").attr("src", image_url).attr("href", image_url);
 	}
 	
 	// prepare the place for the test images to appear
-	$("#test_image").remove();
-	$(document.body).prepend("<a id='test_image' target='_blank'><img  style='width:100px;' /></a>");
+	$("#rezult").prepend("<a id='test_image' target='_blank'><img  NOT_style='width:100px;' /></a>");
+	$test_image = $("#test_image");
+	// $test_image.remove();
 
 	console.log("Async started, spawn() returned : " +
 	spawn({ 'worker': begin_async_operation, 'delay': 1, 'callback': end_async_operation },
@@ -199,36 +191,30 @@ function() {
 	);
 });
 
-
-
-
 $("#test2btn").click(
 function() {
 console.log("!begin");
 for (var j = 0; j < 10; j++) {
-		console.log("Page UID: : " + dbj.uid());
+		console.log( j + "Page UID: : " + Guid());
 	}
 });
 </script>
 <script type="text/javascript" id="PseudoGuid" >
-function Guid() {  }  
-Guid.empty = "00000000-0000-0000-0000-000000000000";    
-Guid.make = function() {        
-     return (Guid.four() + 
-             Guid.four() + "-" + 
-             Guid.four() + "-" + 
-             Guid.four() + "-" + 
-             Guid.four() + "-" + 
-             Guid.four() + 
-             Guid.four() + 
-             Guid.four());
+    function Guid() {
+        var empty = "00000000-0000-0000-0000-000000000000",
+        four = function () {
+            return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1).toUpperCase();
+        };
+        Guid = function () {
+            return (four() + four() + "-" + four() + "-" + four() + "-" +
+                    four() + "-" + four() + four() + four());
+        };
+        return Guid();
     };
-Guid.four = function () {
-  return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1).toUpperCase();
-}
-/*
-Guid.make(), returns: 3368F1CC-73DC-90CA-347F-A0284F0F676D
-*/
+    /*
+    Example: 
+    Guid(), returns: 3368F1CC-73DC-90CA-347F-A0284F0F676D
+    */
 </script>
 </html>
 <!--
