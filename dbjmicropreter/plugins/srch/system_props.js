@@ -1,4 +1,3 @@
-﻿
 (function(global, undefined) {
     /* 
     System search/shell properties from:
@@ -82,3 +81,8 @@
     }
 
 } (this));
+/*
+TypeError 
+Number : 5007
+Description : Unable to get value of the property 'safari': object is null or undefined
+*/

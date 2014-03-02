@@ -46,7 +46,7 @@
 			X.apply({ "eval": false }, arguments); return global.P;
 		};
 
-		/* consider epresions to be printed and evaluated are sent */
+		/* consider expresions to be printed and evaluated are sent */
 		global.E = function () {
 			X.apply({ "eval": true }, arguments); return global.E
 		};
@@ -104,8 +104,9 @@ global.all_is_ok_to_start = function () {
 			);
 			P(function (stack) { this.flush(POP); });
 		});
-		ChiliBook.automatic = false;
+/*		ChiliBook.automatic = false;
 		ChiliBook.lineNumbers = true;
+        */
 	};
 
 } (this));

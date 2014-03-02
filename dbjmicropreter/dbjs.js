@@ -1,4 +1,6 @@
-﻿///<reference path="../lib/dbj/dbj.lib.js" />
+﻿/// <reference path="highlight.js/highlight.pack.js" />
+/// <reference path="highlight.js/highlight.pack.js" />
+///<reference path="../lib/dbj/dbj.lib.js" />
 ///Copyright © 2005-2009 DBJ.ORG. All Rights Reserved.
 //@cc_on
 //@set @_DEBUG =(1==0)
@@ -24,7 +26,9 @@
 			s_ = s_ || ""; // dbj 2009SEP03
 			var rez = "";
 			if (s_ instanceof Error) {
-				rez = s_.name + " " + "\nNumber : " + (s_.number & 0xFFFF) + "\nDescription : " + s_.description;
+			    rez = s_.name + " " + "\nNumber : " + (s_.number & 0xFFFF) +
+                                      "\nDescription : " + s_.description + 
+			                          ( s_.stack ? "\nStack : " + s_.stack : "") ;
 			} else
 				rez = s_;
 			THIS.$display.val(THIS.$display.val() + (comment_begin + rez + comment_end));
@@ -57,6 +61,7 @@
 			//return THIS.compress(THIS.$display.val(), true);
 			return THIS.$display.val();
 		},
+        /*
 		load_script: function (file_Name) {
 			///<summary>
 			///Use jQuery to load and activate the script
@@ -67,7 +72,7 @@
                 //@end
 			});
 		},
-
+        */
 		//-----------------------------------------------------------------------
 		onload: function () {
 
@@ -87,51 +92,62 @@
 
 			global_error_handlers(window, document, document.body);
 			//-----------------------------------------------------------------------
-			// apply every css property in arg object to the jQuery instance
+		    // apply every css property in arg object to the jQuery instance
+		    /*
+            NOT required any more since we have $(...).css(<object for one or more css properties and new values>)
+
 			jQuery.fn.cssApply = function (propobj) {
 				for (var prop in propobj) {
 					this.css(prop, propobj[prop]);
 				}
 				return this;
 			};
+            */
 			//-----------------------------------------------------------------------
 			THIS.$display = $("#display");
-			THIS.load_script("dbjs/jsmin.js");
-			//-----------------------------------------------------------------------
-			var blanket_maker = (function ( /* element_to_be */_blanketed) {
+//-----------------------------------------------------------------------
+			var blanket_maker = function (call_on_show) {
+  
+    jQuery.getScript("highlight.js/highlight.pack.js",
+        function () {
+            var /* element_to_be */_blanketed = $("#display"),
+                $blanket = $(document.body).append("<div id='blanket' style='background-color:white;display:none;overflow:auto; border:1px solid;padding:2px;position:absolute;top:0px;left:0px;z-index:99'><link rel='stylesheet' href='highlight.js/styles/vs.css'><script>hljs.initHighlightingOnLoad();</script><pre class='prettyprint linenums'><code></code></pre></div>").find("#blanket"),
+                $code = $blanket.find("code");
+            $blanket.click(function (event) { $blanket.hide("slow"); });
 
-				var $blanket = $(document.body).append("<div id='blanket' style='background-color:white;display:none;overflow:auto; border:1px solid;padding:2px;position:absolute;top:0px;left:0px;z-index:99'><pre><code class='js' ></code></pre></div>").find("#blanket");
-				var $code = $blanket.find(".js");
-				$blanket.click(function (event) { $blanket.hide("slow"); });
+            blanket_maker = function (call_on_show) {
+                $blanket.hide(0);
+                $code.text('');
+                $blanket.css({
+                    top: _blanketed.position().top,
+                    left: _blanketed.position().left,
+                    width: 1 + _blanketed.width(),
+                    height: _blanketed.height()
+                });
+                if ("function" === typeof call_on_show) call_on_show($code);
+                hljs.highlightBlock($code[0],"TAB");
+                $blanket.show();
+            }
+            blanket_maker(call_on_show);
+        });
+} ;
 
-				return function (call_on_show) {
-					if ("none" !== $blanket.css("display")) {
-						$blanket.hide(0);
-						$code.text('');
-					} else {
-						$blanket.cssApply({
-							top: _blanketed.position().top,
-							left: _blanketed.position().left,
-							width: 1 + _blanketed.width(),
-							height: _blanketed.height()
-						});
-						if ("function" === typeof call_on_show) call_on_show($code);
-						$blanket.show();
-					}
-				}
-			} (THIS.$display));
+THIS.code_painter = function () {
+	try {
+		blanket_maker(
+        /* blanket for syntax highlighted display is styled and ready, but empty
+            give it code in here
+        */
+        function (code_area) {
+            code_area.text("/* click on this panel to edit the code */" + String.NL
+                + THIS.$display.text());
+		});
+	} catch (x) {
+		alert(""+x);
+	}
+};
 
-			THIS.code_painter = function () {
-				blanket_maker(function (code_) {
-					try {
-						code_.text("/* click on this panel to edit the code */" + String.NL + THIS.$display.text()).chili();
-					} catch (x) {
-						THIS.print2(x);
-					}
-				});
-			};
-
-			//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 			THIS.$display.rightMouseDown(function (E) {
 				if (E.altKey) {
 					THIS.code_painter();

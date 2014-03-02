@@ -43,8 +43,10 @@
  <link rel="stylesheet" href="http://960.gs/css/reset.css" />
 <link rel="stylesheet" href="http://960.gs/css/text.css" />
 <!-- link rel="stylesheet" href="http://960.gs/css/960.css" /-->
+    <!--
 <link rel="stylesheet" href="styles/vs.css">
 <script src="highlight.pack.js"></script>
+        -->
 <!-- script>hljs.initHighlightingOnLoad(); -->
 
 		<style type="text/css" media="screen">
@@ -147,16 +149,17 @@ End Function
 			"http://dbj.org/6/dbj.es5.js",
 			"http://dbj.org/6/dbj.jquery.js",
 			"http://dbj.org/6/dbj.xml.json.js",
+	/*
 			"../lib/chili/jquery.chili-2.2.js",
 			"../lib/chili/recipes.js",
-	/*
 	"plugins/ado/ado.vbs",
 	"plugins/ado/dbj.ado.vbs",
 	"plugins/winsearch.js",
 	*/
 			"dbjs.js",
 			"dbjs/dbjs.mbox.js",
-			"dbjs/dbjs.start.js"
+			"dbjs/dbjs.start.js",
+            "dbjs/jsmin.js"
 			],
 			function () { return !!window.jQuery && !!window.dbj && !!window.THIS && !!window.all_is_ok_to_start; },
 			function () { all_is_ok_to_start(); }

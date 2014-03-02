@@ -1,4 +1,3 @@
-﻿
 (function (global, undefined) {
     //--------------------------------------------------------------------------------------------
     var constr = [
@@ -69,3 +68,8 @@ scope = ["c:/dbj"];
     //--------------------------------------------------------------------------------------------
 
 } (this));
+/*
+TypeError 
+Number : 5007
+Description : Unable to get value of the property 'safari': object is null or undefined
+*/

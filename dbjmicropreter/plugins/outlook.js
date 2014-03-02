@@ -342,18 +342,22 @@
     // which in turn has to point to a bookmark in the html document which is named
     // same as this js file.
     OL.A = function() {
+       window.setTimeout( function () {
         var V = new OL.Visitor.back_to_inbox();
         OL.visitor_user(V);
-        return "Moved total: " + V.removed_total + ", OL.A() finished";
+        alert("Moved total: " + V.removed_total + ", OL.A() finished");
+        }, 10 ) ;
     }
     OL.A.summary = {
         url: "outlook.html#move_to_root",
         title: "Move mail back to root folder selected"
     };
     OL.B = function() {
+       window.setTimeout( function () {
         var V = new OL.Visitor.empty_folder_remover();
         OL.visitor_user(V);
         return "Removed total: " + V.removed_total + ", empty folders, OL.B() finished";
+        }, 10 ) ;
     }
     OL.B.summary = {
         url: "outlook.html#remove_empty_folders",
@@ -400,11 +404,11 @@
         title: "Auto Sorter"
     };
     //-----------------------------------------------------------------
-    if ("undefined" != typeof THIS)
-        THIS.plugins.add("OL", OL);
-    else
-        if ("undefined" === typeof window.OL)
         window.OL = OL; // global
     //-----------------------------------------------------------------
 })(window);
-//-----------------------------------------------------------------
+
+alert(OL.B())
+/*
+undefined
+*/
