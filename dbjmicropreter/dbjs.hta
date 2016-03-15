@@ -133,22 +133,25 @@ Function mBox(m_,n,t_)
 			End If
 End Function
 </script>
-<script type="text/javascript" src="http://dbj.org/6/dbj.lod.js" ></script>
+<!-- script type="text/javascript" src="http://dbj.org/6/dbj.lod.js" ></script -->
+<script type="text/javascript" src="http://y.dbjdbj.org/6/dbj.lod.js" ></script>
 <script type="text/javascript" >
 //@cc_on
 //@set @_DEBUG =(1==0)
 //@set @_TRACE =(1==0)
 //-------------------------------------------------------------------------
-@if (@_DEBUG) debugger;	@end
+// dbj 2016 JAN 25 this does not work anymore, at least not outside of comment
+//@if (@_DEBUG) debugger;	@end  
 //-----------------------------------------------------------------------
+// dbj 2016 JAN 25 dbjdbj.org changes to y.dbjdbj.org in url's
 	dbjdbj.load(
 			[
 			"http://code.jquery.com/jquery-git.js",
 			"../lib/jquery.rightClick.js",
-			"http://dbj.org/6/dbj.lib.js",
-			"http://dbj.org/6/dbj.es5.js",
-			"http://dbj.org/6/dbj.jquery.js",
-			"http://dbj.org/6/dbj.xml.json.js",
+			"http://y.dbj.org/6/dbj.lib.js",
+			"http://y.dbj.org/6/dbj.es5.js",
+			"http://y.dbj.org/6/dbj.jquery.js",
+			"http://y.dbj.org/6/dbj.xml.json.js",
 	/*
 			"../lib/chili/jquery.chili-2.2.js",
 			"../lib/chili/recipes.js",

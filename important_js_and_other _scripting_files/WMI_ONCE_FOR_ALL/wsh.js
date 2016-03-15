@@ -16,27 +16,33 @@ main();
 //-------------------------------------------------------------------------------------------
 function main ()
 {
-var adOBJ = GetObject("WinNT://./admin,user");
+ // adOBJ = GetObject("WinNT://./admin,user");
+ adOBJ = GetObject("WinNT://./ws01,computer");
  ad_sema = GetObject(adOBJ.Schema);
-		//print("Props of adOBJ") ;
-		//base_props( adOBJ ) ;
+ 
+ adOBJ.GetInfo();
+ 
+		base_props( adOBJ ) ;
+		base_props( ad_sema ) ;
 		print("Attributes of " + adOBJ.AdsPath + " Schema") ;
-		//base_props( ad_sema ) ;
-			print("Mandatory attributes:") ;
-			foreach ( ad_sema.MandatoryProperties, enumProperties )
-				print( "\nOptional attributes:" );
-				foreach ( ad_sema.OptionalProperties, enumProperties )
+		print("Mandatory attributes:") ;
+		foreach ( ad_sema.MandatoryProperties, enumProperties );
+		print( "\nOptional attributes:" );
+		foreach ( ad_sema.OptionalProperties, enumProperties );
 	print_buffer_flush() ;
 }
 //-------------------------------------------------------------------------------------------
 function enumProperties (	strAttribute , x  )
 {
-	global_prop_counter += 1
-	print( global_prop_counter + "\t" + strAttribute );
+	global_prop_counter += 1;
 	try {
-		var objAttribute = ad_sema.GetObject("Property",  strAttribute)
-		print( " (Syntax: " + objAttribute.Syntax + ")")
-		print( objAttribute.MultiValued ? " Multivalued" : " Single-valued" );
+//		var objAttribute = ad_sema.GetObject("Property" , strAttribute );
+//		var objAttribute = ad_sema.GetEx( strAttribute );
+//		print( " (Syntax: " + objAttribute.Syntax + ")");
+//		print( objAttribute.MultiValued ? " Multivalued" : " Single-valued" );
+
+			adOBJ.GetInfoEx(strAttribute,0);
+		print( global_prop_counter + "\t" + strAttribute + " :: " + adOBJ[strAttribute] );
 	} catch (x) {
 		print( x.message ) ;
 	}
@@ -49,7 +55,8 @@ function base_props ( ad_object, x )
 			"\nBase Properties : " +
 			"\nName\t:\t" + ad_object.Name + 
 			"\nClass\t:\t" + ad_object.Class + 
-			"\nAD Path\t:\t" + ad_object.AdsPath
+			"\nAD Path\t:\t" + ad_object.AdsPath +
+			"\n-------------------------------------------------"
 			) ;
 	} catch ( x) {
 		print( "EXCEPTION\n" + x.message ) ;
